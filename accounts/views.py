@@ -19,7 +19,7 @@ def login_required(f: F) -> F:
     def wrapped(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         if get_request_user(request) is None:
             messages.warning(request, "Please log in to continue.")
-            return redirect("accounts:login_view")
+            return redirect("accounts:login")
         return f(request, *args, **kwargs)
     return wrapped  # type: ignore[return-value]
 
@@ -30,10 +30,10 @@ def organizer_required(f: F) -> F:
         user = get_request_user(request)
         if user is None:
             messages.warning(request, "Please log in to continue.")
-            return redirect("accounts:login_view")
+            return redirect("accounts:login")
         if not getattr(user, "is_organizer", False):
             messages.error(request, "Organizer access required.")
-            return redirect("accounts:me_view")
+            return redirect("accounts:me")
         return f(request, *args, **kwargs)
     return wrapped  # type: ignore[return-value]
 
@@ -43,7 +43,7 @@ class LoginView(View):
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
-            return redirect("accounts:me_view")
+            return redirect("accounts:me")
         return render(request, "accounts/login.html", {"form": LoginForm()})
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -68,7 +68,7 @@ class LoginView(View):
         next_url = request.GET.get("next")
         if next_url and next_url.startswith("/") and not next_url.startswith("//"):
             return redirect(next_url)
-        return redirect("accounts:me_view")
+        return redirect("accounts:me")
 
 
 class LogoutView(View):
@@ -77,12 +77,12 @@ class LogoutView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         logout_user(request)
         messages.info(request, "You have been logged out.")
-        return redirect("accounts:login_view")
+        return redirect("accounts:login")
 
     def post(self, request: HttpRequest) -> HttpResponse:
         logout_user(request)
         messages.info(request, "You have been logged out.")
-        return redirect("accounts:login_view")
+        return redirect("accounts:login")
 
 
 class RegisterView(View):
@@ -90,7 +90,7 @@ class RegisterView(View):
 
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
-            return redirect("accounts:me_view")
+            return redirect("accounts:me")
         return render(request, "accounts/register.html", {"form": RegisterForm()})
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -105,7 +105,7 @@ class RegisterView(View):
         user.save()
         login_user(request, user)
         messages.success(request, "Account created. Welcome to Tickr!")
-        return redirect("accounts:me_view")
+        return redirect("accounts:me")
 
 
 class MeView(View):
@@ -164,4 +164,4 @@ class OrganizerProfileView(View):
             messages.success(request, "Organizer profile updated.")
         else:
             messages.success(request, "Organizer profile created.")
-        return redirect("accounts:organizer_profile_view")
+        return redirect("organizer_profile")

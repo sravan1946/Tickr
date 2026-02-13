@@ -12,9 +12,9 @@
     {% if user.is_organizer %}
         <p style="margin-top: 1rem;">
             {% if has_organizer_profile %}
-                <a href="{% url 'accounts:organizer_profile_view' %}" class="btn">Edit organizer profile</a>
+                <a href="{% url 'organizer_profile' %}" class="btn">Edit organizer profile</a>
             {% else %}
-                <a href="{% url 'accounts:organizer_profile_view' %}" class="btn">Set up organizer profile</a>
+                <a href="{% url 'organizer_profile' %}" class="btn">Set up organizer profile</a>
             {% endif %}
         </p>
     {% endif %}

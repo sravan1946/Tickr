@@ -12,7 +12,7 @@
             Add your organization details so you can create and manage events.
         {% endif %}
     </p>
-    <form method="post" action="{% url 'accounts:organizer_profile_view' %}">
+    <form method="post" action="{% url 'organizer_profile' %}">
         {% csrf_token %}
         {% for field in form %}
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -22,7 +22,7 @@
         <button type="submit" class="btn">{% if profile %}Update{% else %}Create{% endif %} profile</button>
     </form>
     <p style="margin-top: 1rem;">
-        <a href="{% url 'accounts:me_view' %}" class="btn btn-ghost" style="display: inline-block; width: auto;">Back to profile</a>
+        <a href="{% url 'accounts:me' %}" class="btn btn-ghost" style="display: inline-block; width: auto;">Back to profile</a>
     </p>
 </div>
 {% endblock %}

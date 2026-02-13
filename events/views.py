@@ -30,7 +30,7 @@ def _event_owned_by_user(request: HttpRequest, event: Event) -> bool:
 
 
 class EventListView(View):
-    """GET /events/ — list published events. Logged-in organizers see link to their events."""
+    """GET /events/ — list. POST /events/ — create (organizer only, per spec)."""
 
     def get(self, request: HttpRequest) -> HttpResponse:
         events = Event.objects.filter(is_published=True, is_cancelled=False).order_by(
@@ -45,8 +45,27 @@ class EventListView(View):
         return render(
             request,
             "events/event_list.html",
-            {"events": events, "my_events": my_events},
+            {
+                "events": events,
+                "my_events": my_events,
+                "is_organizer": organizer_profile is not None,
+            },
         )
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        """POST /events/ — create event (organizer only)."""
+        organizer_profile = _get_organizer_profile(request)
+        if not organizer_profile:
+            messages.error(request, "Organizer access required.")
+            return redirect("events:event_list")
+        form = EventForm(request.POST)
+        if not form.is_valid():
+            return render(request, "events/event_form.html", {"form": form}, status=400)
+        event = form.save(commit=False)
+        event.organizer = organizer_profile
+        event.save()
+        messages.success(request, "Event created.")
+        return redirect("events:event_detail", slug=event.slug)
 
 
 class EventDetailView(View):
@@ -65,26 +84,11 @@ class EventDetailView(View):
 
 
 class EventCreateView(View):
-    """GET/POST /events/create/ — organizer only."""
+    """GET /events/create/ — show create form (organizer only). Form posts to POST /events/."""
 
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest) -> HttpResponse:
         return render(request, "events/event_form.html", {"form": EventForm()})
-
-    @method_decorator(organizer_required)
-    def post(self, request: HttpRequest) -> HttpResponse:
-        form = EventForm(request.POST)
-        if not form.is_valid():
-            return render(request, "events/event_form.html", {"form": form}, status=400)
-        organizer_profile = _get_organizer_profile(request)
-        if not organizer_profile:
-            messages.error(request, "Organizer profile required.")
-            return redirect("accounts:organizer_profile_view")
-        event = form.save(commit=False)
-        event.organizer = organizer_profile
-        event.save()
-        messages.success(request, "Event created.")
-        return redirect("events:event_detail", slug=event.slug)
 
 
 class EventUpdateView(View):
@@ -141,7 +145,7 @@ class EventDeleteView(View):
 
 
 class EventSessionListView(View):
-    """GET /events/<id>/sessions/ — list sessions for an event (owner or public if published)."""
+    """GET /events/<id>/sessions/ — list. POST /events/<id>/sessions/ — add session (per spec)."""
 
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
@@ -153,37 +157,23 @@ class EventSessionListView(View):
         return render(
             request,
             "events/event_sessions.html",
-            {"event": event, "sessions": sessions},
-        )
-
-
-class EventSessionCreateView(View):
-    """GET/POST /events/<id>/sessions/create/ — add session (organizer, must own event)."""
-
-    @method_decorator(organizer_required)
-    def get(self, request: HttpRequest, pk: str) -> HttpResponse:
-        event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
-            messages.error(request, "You can only add sessions to your own events.")
-            return redirect("events:event_list")
-        return render(
-            request,
-            "events/session_form.html",
-            {"form": EventSessionForm(), "event": event},
+            {"event": event, "sessions": sessions, "form": EventSessionForm()},
         )
 
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
+        """POST /events/<id>/sessions/ — add session."""
         event = get_object_or_404(Event, pk=pk)
         if not _event_owned_by_user(request, event):
             messages.error(request, "You can only add sessions to your own events.")
             return redirect("events:event_list")
         form = EventSessionForm(request.POST)
         if not form.is_valid():
+            sessions = event.sessions.order_by("start_time")
             return render(
                 request,
-                "events/session_form.html",
-                {"form": form, "event": event},
+                "events/event_sessions.html",
+                {"event": event, "sessions": sessions, "form": form},
                 status=400,
             )
         session = form.save(commit=False)

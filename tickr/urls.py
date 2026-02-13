@@ -17,7 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from accounts.views import OrganizerProfileView
+from events.views import CategoryListView, VenueListView
+
+# URL structure matches tickr.md §4 API Endpoints.
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("accounts.urls")),
+    path("auth/", include("accounts.urls")),
+    path("organizer/profile/", OrganizerProfileView.as_view(), name="organizer_profile"),
+    path("events/", include("events.urls")),
+    path("categories/", CategoryListView.as_view(), name="category_list"),
+    path("venues/", VenueListView.as_view(), name="venue_list"),
 ]

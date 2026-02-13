@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Events{% endblock %}
+{% block main_class %}container-wide{% endblock %}
+
+{% block nav %}
+    <a href="{% url 'events:event_list' %}">Events</a>
+    {% if is_organizer %}
+        <a href="{% url 'events:event_create' %}">Create event</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-top: 0;">Events</h1>
+
+{% if my_events %}
+<section class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-top: 0; font-size: 1.1rem;">My events</h2>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for event in my_events %}
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+            <a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+            {% if not event.is_published %}<span style="color: var(--text-muted); font-size: 0.85rem;"> (draft)</span>{% endif %}
+            —
+            <a href="{% url 'events:event_edit' pk=event.pk %}">Edit</a>
+            <a href="{% url 'events:event_sessions' pk=event.pk %}">Sessions</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <p style="margin: 0.75rem 0 0 0;">
+        <a href="{% url 'events:event_create' %}" class="btn">Create event</a>
+    </p>
+</section>
+{% endif %}
+
+<section class="card">
+    <h2 style="margin-top: 0; font-size: 1.1rem;">Upcoming events</h2>
+    {% if events %}
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for event in events %}
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+            <a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+            <span style="color: var(--text-muted); font-size: 0.9rem;"> — {{ event.start_date|date:"M j, Y" }} at {{ event.venue.name }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--text-muted);">No upcoming events yet.</p>
+    {% endif %}
+</section>
+
+<p>
+    <a href="{% url 'category_list' %}">Categories</a> ·
+    <a href="{% url 'venue_list' %}">Venues</a>
+</p>
+{% endblock %}

@@ -10,19 +10,20 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'accounts:login_view' %}">Tickr</a>
+        <a href="{% url 'accounts:login' %}">Tickr</a>
+        <a href="{% url 'events:event_list' %}">Events</a>
         {% block nav %}{% endblock %}
         <span class="nav-right">
             {% if account_user %}
-                <a href="{% url 'accounts:me_view' %}">Profile</a>
-                <a href="{% url 'accounts:logout_view' %}">Log out</a>
+                <a href="{% url 'accounts:me' %}">Profile</a>
+                <a href="{% url 'accounts:logout' %}">Log out</a>
             {% else %}
-                <a href="{% url 'accounts:login_view' %}">Log in</a>
-                <a href="{% url 'accounts:register_view' %}">Register</a>
+                <a href="{% url 'accounts:login' %}">Log in</a>
+                <a href="{% url 'accounts:register' %}">Register</a>
             {% endif %}
         </span>
     </nav>
-    <main class="container">
+    <main class="container {% block main_class %}{% endblock %}">
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}

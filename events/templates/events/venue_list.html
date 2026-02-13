@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Venues{% endblock %}
+{% block main_class %}container-wide{% endblock %}
+
+{% block nav %}
+    <a href="{% url 'events:event_list' %}">Events</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Venues</h1>
+    {% if venues %}
+    <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for venue in venues %}
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+            <strong>{{ venue.name }}</strong> — {{ venue.address }}, {{ venue.city }} (capacity: {{ venue.capacity }})
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--text-muted);">No venues yet.</p>
+    {% endif %}
+    <p style="margin-top: 1rem;"><a href="{% url 'events:event_list' %}">← Back to events</a></p>
+</div>
+{% endblock %}

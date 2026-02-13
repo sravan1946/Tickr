@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{% if event %}Edit{% else %}Create{% endif %} event{% endblock %}
+
+{% block nav %}
+    <a href="{% url 'events:event_list' %}">Events</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">{% if event %}Edit event{% else %}Create event{% endif %}</h1>
+    <form method="post" action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_list' %}{% endif %}">
+        {% csrf_token %}
+        {% for field in form %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% endfor %}
+        <button type="submit" class="btn">{% if event %}Update{% else %}Create{% endif %} event</button>
+    </form>
+    <p style="margin-top: 1rem;">
+        <a href="{% url 'events:event_list' %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
+    </p>
+</div>
+{% endblock %}

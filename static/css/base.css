@@ -38,6 +38,10 @@ a:hover {
     padding: 1.5rem;
 }
 
+.container-wide {
+    max-width: 720px;
+}
+
 .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -141,6 +145,11 @@ label {
     font-size: 0.8rem;
     color: var(--text-muted);
     margin-top: 0.25rem;
+}
+
+.form-checkbox {
+    width: auto;
+    margin-right: 0.5rem;
 }
 
 nav {

@@ -6,7 +6,7 @@
 <div class="card">
     <h1 style="margin-top:0;">Create account</h1>
     <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Join Tickr to discover events and manage your tickets.</p>
-    <form method="post" action="{% url 'accounts:register_view' %}">
+    <form method="post" action="{% url 'accounts:register' %}">
         {% csrf_token %}
         {% for field in form %}
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -17,7 +17,7 @@
         <button type="submit" class="btn">Register</button>
     </form>
     <p style="margin-top: 1rem; text-align: center;">
-        Already have an account? <a href="{% url 'accounts:login_view' %}">Log in</a>
+        Already have an account? <a href="{% url 'accounts:login' %}">Log in</a>
     </p>
 </div>
 {% endblock %}
