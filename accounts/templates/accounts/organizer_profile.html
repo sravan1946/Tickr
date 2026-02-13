@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{% if profile %}Edit{% else %}Create{% endif %} organizer profile{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top:0;">{% if profile %}Edit organizer profile{% else %}Organizer profile{% endif %}</h1>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        {% if profile %}
+            Update your organization details.
+        {% else %}
+            Add your organization details so you can create and manage events.
+        {% endif %}
+    </p>
+    <form method="post" action="{% url 'accounts:organizer_profile_view' %}">
+        {% csrf_token %}
+        {% for field in form %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        {% endfor %}
+        <button type="submit" class="btn">{% if profile %}Update{% else %}Create{% endif %} profile</button>
+    </form>
+    <p style="margin-top: 1rem;">
+        <a href="{% url 'accounts:me_view' %}" class="btn btn-ghost" style="display: inline-block; width: auto;">Back to profile</a>
+    </p>
+</div>
+{% endblock %}

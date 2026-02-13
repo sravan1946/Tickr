@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top:0;">Log in</h1>
+    <p class="text-muted" style="color: var(--text-muted); margin-bottom: 1.5rem;">Sign in to your Tickr account.</p>
+    <form method="post" action="{% url 'accounts:login_view' %}">
+        {% csrf_token %}
+        {% for field in form %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% endfor %}
+        <button type="submit" class="btn">Log in</button>
+    </form>
+    <p style="margin-top: 1rem; text-align: center;">
+        Don't have an account? <a href="{% url 'accounts:register_view' %}">Register</a>
+    </p>
+</div>
+{% endblock %}

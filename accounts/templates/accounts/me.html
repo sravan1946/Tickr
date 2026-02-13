@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}My profile{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top:0;">My profile</h1>
+    <p><strong>Email</strong> {{ user.email }}</p>
+    <p><strong>Username</strong> {{ user.username }}</p>
+    <p><strong>Account type</strong> {% if user.is_organizer %}Organizer{% else %}Attendee{% endif %}</p>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Joined {{ user.created_at|date:"F j, Y" }}</p>
+    {% if user.is_organizer %}
+        <p style="margin-top: 1rem;">
+            {% if has_organizer_profile %}
+                <a href="{% url 'accounts:organizer_profile_view' %}" class="btn">Edit organizer profile</a>
+            {% else %}
+                <a href="{% url 'accounts:organizer_profile_view' %}" class="btn">Set up organizer profile</a>
+            {% endif %}
+        </p>
+    {% endif %}
+</div>
+{% endblock %}
