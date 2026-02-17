@@ -9,6 +9,7 @@
 <a href="{% url 'events:event_edit' pk=event.pk %}">Edit</a>
 <a href="{% url 'events:event_tickets' pk=event.pk %}">Tickets</a>
 <a href="{% url 'event_promocode_list' pk=event.pk %}">Promos</a>
+<a href="{% url 'checkin:checkin_scan' pk=event.pk %}">Check-in</a>
 {% endif %}
 {% endblock %}
 
@@ -46,6 +47,8 @@
             style="width: auto; margin-left: 0.5rem;">Promo Codes</a>
         <a href="{% url 'events:event_delete' pk=event.pk %}" class="btn btn-ghost"
             style="width: auto; margin-left: 0.5rem;">Delete</a>
+        <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn btn-ghost"
+            style="width: auto; margin-left: 0.5rem;">Check-in</a>
     </p>
     {% endif %}
 </article>

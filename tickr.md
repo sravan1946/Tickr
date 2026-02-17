@@ -17,7 +17,7 @@ This project is intentionally scoped to be complex enough to showcase real Djang
 - Apply promo codes at checkout
 - Receive digital tickets (unique codes)
 - View order history & ticket details
-- Event-day check-in via QR / code *(not yet implemented)*
+- Event-day check-in via ticket code
 
 ### Organizer Side
 - Organizer profile (create & update)
@@ -26,7 +26,8 @@ This project is intentionally scoped to be complex enough to showcase real Djang
 - Create & manage promo codes per event
 - Validate promo codes
 - Monitor sales via order details
-- Validate tickets during check-in *(not yet implemented)*
+- Validate tickets during check-in
+- View check-in stats per event
 
 ---
 
@@ -39,7 +40,7 @@ tickr/
 ├── tickets/           # Ticket types & individual tickets
 ├── orders/            # Orders, order items, attendees
 ├── promotions/        # Promo codes (CRUD + validation)
-├── checkin/           # Check-in system (stub — not yet implemented)
+├── checkin/           # Check-in system (scan, validate, stats)
 ├── core/              # Shared utilities (stub — not yet implemented)
 ├── templates/         # Global templates (base.html, includes/)
 └── static/            # Static assets (CSS/JS)
@@ -165,13 +166,14 @@ tickr/
 
 ---
 
-### Check-in *(not yet implemented)*
+### Check-in
 
 #### CheckIn
-- id
+- id (UUIDField, PK)
 - ticket (OneToOne → Ticket)
-- checked_in_at
+- checked_in_at (DateTimeField, auto_now_add)
 - checked_in_by (FK → User)
+- **Meta:** ordering = `["-checked_in_at"]`
 
 ---
 
@@ -250,9 +252,12 @@ tickr/
 |--------|-----|-------------|
 | GET | `/admin/` | Django Admin panel |
 
-### Check-in *(not yet implemented)*
-
----
+### Check-in (`/checkin/`)
+| Method | URL | View | Description |
+|--------|-----|------|-------------|
+| GET | `/checkin/<event_id>/` | `CheckInScanView.get` | Show check-in scan form |
+| POST | `/checkin/<event_id>/` | `CheckInScanView.post` | Validate ticket & record check-in |
+| GET | `/checkin/<event_id>/list/` | `CheckInListView` | List all check-ins for event |
 
 ## 5. Authentication System
 
@@ -306,6 +311,11 @@ promotions/templates/promotions/
 ├── promocode_form.html
 ├── promocode_list.html
 └── promocode_confirm_delete.html
+
+checkin/templates/checkin/
+├── checkin_scan.html
+├── checkin_result.html
+└── checkin_list.html
 ```
 
 ---
@@ -321,6 +331,7 @@ Each app defines its own forms in `forms.py`:
 | `tickets` | `TicketTypeForm` |
 | `orders` | `OrderTicketForm`, `AttendeeForm` |
 | `promotions` | `PromoCodeForm`, `PromoCodeValidateForm` |
+| `checkin` | `CheckInForm` |
 
 ---
 
@@ -387,7 +398,7 @@ erDiagram
 | 3 | `tickets` | ✅ Complete |
 | 4 | `orders` | ✅ Complete |
 | 5 | `promotions` | ✅ Complete |
-| 6 | `checkin` | ⬜ Not started (app created, no models/views) |
+| 6 | `checkin` | ✅ Complete |
 | 7 | `core` | ⬜ Not started (app created, no models/views) |
 
 ---

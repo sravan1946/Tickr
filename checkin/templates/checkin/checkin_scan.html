@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Check-in — {{ event.title }}{% endblock %}
+{% block main_class %}container-wide{% endblock %}
+
+{% block nav %}
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'checkin:checkin_list' pk=event.pk %}">View Check-ins</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Check-in</h1>
+    <p style="color: var(--text-muted);">Event: {{ event.title }}</p>
+
+    {% if total_tickets is not None %}
+    <div style="display: flex; gap: 1.5rem; margin: 1rem 0 1.5rem 0;">
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
+            <p style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--accent);">{{ checked_in_count }}</p>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Checked In</p>
+        </div>
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
+            <p style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_tickets }}</p>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Total Booked</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
+        {% csrf_token %}
+        <label for="id_code">Ticket Code</label>
+        {{ form.code }}
+        {{ form.code.errors }}
+        <button type="submit" class="btn" style="margin-top: 0.5rem;">Check In</button>
+    </form>
+</div>
+
+<p>
+    <a href="{% url 'checkin:checkin_list' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">View all check-ins</a>
+    <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto; margin-left: 0.5rem;">Back to event</a>
+</p>
+{% endblock %}

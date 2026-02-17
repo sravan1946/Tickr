@@ -35,4 +35,5 @@ urlpatterns = [
     path("my/orders/", MyOrdersView.as_view(), name="my_orders"),
     path("promocodes/", include("promotions.urls")),
     path("events/<uuid:pk>/promocodes/", EventPromoCodeListView.as_view(), name="event_promocode_list"),
+    path("checkin/", include("checkin.urls")),
 ]

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Check-in Result — {{ event.title }}{% endblock %}
+{% block main_class %}container-wide{% endblock %}
+
+{% block nav %}
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'checkin:checkin_scan' pk=event.pk %}">Scan</a>
+<a href="{% url 'checkin:checkin_list' pk=event.pk %}">View Check-ins</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    {% if success %}
+    <div
+        style="border: 2px solid var(--success); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+        <p style="font-size: 2rem; margin: 0;">✅</p>
+        <h2 style="color: var(--success); margin: 0.5rem 0 0 0;">Checked In!</h2>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">{{ checkin.checked_in_at|date:"M j, Y g:i A" }}</p>
+    </div>
+
+    <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+        <p style="margin: 0.5rem 0;"><strong>Ticket Code:</strong> <code>{{ ticket.code }}</code></p>
+        <p style="margin: 0.5rem 0;"><strong>Ticket Type:</strong> {{ ticket.ticket_type.name }}</p>
+        {% if attendee %}
+        <p style="margin: 0.5rem 0;"><strong>Attendee:</strong> {{ attendee.full_name }} ({{ attendee.email }})</p>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div
+        style="border: 2px solid var(--error); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+        <p style="font-size: 2rem; margin: 0;">❌</p>
+        <h2 style="color: var(--error); margin: 0.5rem 0 0 0;">Check-in Failed</h2>
+        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <h3 style="margin-top: 1.5rem;">Scan Another Ticket</h3>
+    <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
+        {% csrf_token %}
+        <label for="id_code">Ticket Code</label>
+        {{ form.code }}
+        {{ form.code.errors }}
+        <button type="submit" class="btn" style="margin-top: 0.5rem;">Check In</button>
+    </form>
+</div>
+
+<p>
+    <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Back to scan</a>
+    <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost"
+        style="width: auto; margin-left: 0.5rem;">Back to event</a>
+</p>
+{% endblock %}

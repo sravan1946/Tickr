@@ -3,20 +3,20 @@
 {% block title %}Ticket {{ ticket.code }}{% endblock %}
 
 {% block nav %}
-    <a href="{% url 'events:event_list' %}">Events</a>
-    <a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'events:event_list' %}">Events</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
 {% endblock %}
 
 {% block content %}
 <div class="card">
     <h1 style="margin-top: 0;">Ticket Details</h1>
-    
+
     <div style="border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
         <div style="text-align: center; margin-bottom: 1rem;">
             <h2 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.1em;">{{ ticket.code }}</h2>
             <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">Ticket Code</p>
         </div>
-        
+
         <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
             <p style="margin: 0.5rem 0;">
                 <strong>Event:</strong> {{ event.title }}
@@ -28,21 +28,30 @@
                 <strong>Price:</strong> ${{ ticket_type.price }}
             </p>
             <p style="margin: 0.5rem 0;">
-                <strong>Status:</strong> 
+                <strong>Status:</strong>
                 <span style="text-transform: capitalize;">
                     {% if ticket.status == "available" %}
-                        <span style="color: var(--success);">Available</span>
+                    <span style="color: var(--success);">Available</span>
                     {% elif ticket.status == "booked" %}
-                        <span style="color: var(--accent);">Booked</span>
+                    <span style="color: var(--accent);">Booked</span>
                     {% elif ticket.status == "cancelled" %}
-                        <span style="color: var(--error);">Cancelled</span>
+                    <span style="color: var(--error);">Cancelled</span>
                     {% else %}
-                        {{ ticket.status }}
+                    {{ ticket.status }}
                     {% endif %}
                 </span>
             </p>
             <p style="margin: 0.5rem 0;">
                 <strong>Created:</strong> {{ ticket.created_at|date:"M j, Y g:i A" }}
+            </p>
+            <p style="margin: 0.5rem 0;">
+                <strong>Check-in:</strong>
+                {% if ticket.checkin %}
+                <span style="color: var(--success);">✅ Checked in at {{ ticket.checkin.checked_in_at|date:"M j, Y g:i A"
+                    }}</span>
+                {% else %}
+                <span style="color: var(--text-muted);">Not checked in</span>
+                {% endif %}
             </p>
         </div>
     </div>
@@ -54,7 +63,8 @@
     {% endif %}
 
     <p style="margin-top: 1.5rem;">
-        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to event</a>
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
+            event</a>
     </p>
 </div>
 {% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Check-ins — {{ event.title }}{% endblock %}
+{% block main_class %}container-wide{% endblock %}
+
+{% block nav %}
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'checkin:checkin_scan' pk=event.pk %}">Scan</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <h1 style="margin-top: 0;">Check-ins</h1>
+        <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn" style="width: auto;">Scan Ticket</a>
+    </div>
+    <p style="color: var(--text-muted);">Event: {{ event.title }}</p>
+
+    <div style="display: flex; gap: 1.5rem; margin: 1rem 0 1.5rem 0;">
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
+            <p style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--accent);">{{ checked_in_count }}</p>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Checked In</p>
+        </div>
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
+            <p style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_tickets }}</p>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Total Booked</p>
+        </div>
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
+            {% widthratio checked_in_count total_tickets 100 as pct %}
+            <p style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--success);">
+                {% if total_tickets %}{% widthratio checked_in_count total_tickets 100 %}%{% else %}0%{% endif %}
+            </p>
+            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Complete</p>
+        </div>
+    </div>
+
+    {% if checkins %}
+    <div style="margin-top: 1.5rem;">
+        {% for ci in checkins %}
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+                <h3 style="margin: 0 0 0.25rem 0;">
+                    <code>{{ ci.ticket.code }}</code>
+                    <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">· {{
+                        ci.ticket.ticket_type.name }}</span>
+                </h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                    Checked in at {{ ci.checked_in_at|date:"M j, Y g:i A" }}
+                    &middot; by {{ ci.checked_in_by.username }}
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'tickets:ticket_detail' code=ci.ticket.code %}" class="btn btn-ghost"
+                    style="width: auto;">View Ticket</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted); margin-top: 1rem;">No check-ins recorded yet. Start scanning tickets!</p>
+    {% endif %}
+
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
+            event</a>
+    </p>
+</div>
+{% endblock %}
