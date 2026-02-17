@@ -94,12 +94,6 @@ tickr/
 - is_published
 - is_cancelled
 - created_at
-
-#### EventSession
-- id
-- event (FK → Event)
-- start_time
-- end_time
 - capacity
 
 #### EventImage
@@ -200,8 +194,6 @@ tickr/
 - POST /events/
 - PUT /events/<id>/
 - DELETE /events/<id>/
-- GET /events/<id>/sessions/
-- POST /events/<id>/sessions/
 - GET /categories/
 - GET /venues/
 
@@ -265,7 +257,6 @@ erDiagram
 
     EVENT }o--|| EVENT_CATEGORY : categorized_as
     EVENT }o--|| VENUE : held_at
-    EVENT ||--o{ EVENT_SESSION : has
     EVENT ||--o{ TICKET_TYPE : defines
     EVENT ||--o{ PROMO_CODE : offers
     EVENT ||--o{ EVENT_IMAGE : displays
@@ -303,4 +294,3 @@ erDiagram
 - Clear model relationships
 - Extendable to payments, APIs, mobile apps
 - Resume-safe and interview-friendly
-

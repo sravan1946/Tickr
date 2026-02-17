@@ -27,6 +27,7 @@ class RegisterForm(forms.ModelForm):
         required=False,
         initial=False,
         label="I'm an organizer",
+        widget=forms.CheckboxInput(attrs={"class": "form-checkbox"}),
     )
 
     class Meta:
@@ -77,9 +78,22 @@ class OrganizerProfileForm(forms.ModelForm):
         commit: bool = True,
         user: User | None = None,
     ) -> OrganizerProfile:
+        """
+        Ensure the OrganizerProfile is always linked to a User.
+
+        The view must pass the currently logged-in user via the `user` kwarg.
+        If it doesn't, we raise a clear error instead of hitting a DB
+        IntegrityError for the NOT NULL user_id constraint.
+        """
         instance = super().save(commit=False)
-        if user is not None and instance.pk is None:
+
+        if user is None and instance.user_id is None:
+            raise ValueError("OrganizerProfileForm.save() requires a non-null `user`.")
+
+        # Always (re)associate the profile with the given user if provided.
+        if user is not None:
             instance.user = user
+
         if commit:
             instance.save()
         return instance

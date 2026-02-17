@@ -4,11 +4,11 @@
 {% block main_class %}container-wide{% endblock %}
 
 {% block nav %}
-    <a href="{% url 'events:event_list' %}">Events</a>
-    {% if is_owner %}
-        <a href="{% url 'events:event_edit' pk=event.pk %}">Edit</a>
-        <a href="{% url 'events:event_sessions' pk=event.pk %}">Sessions</a>
-    {% endif %}
+<a href="{% url 'events:event_list' %}">Events</a>
+{% if is_owner %}
+<a href="{% url 'events:event_edit' pk=event.pk %}">Edit</a>
+<a href="{% url 'event_tickets' pk=event.pk %}">Tickets</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -24,6 +24,7 @@
     <p style="color: var(--text-muted); font-size: 0.95rem;">
         {{ event.start_date|date:"l, F j, Y" }} – {{ event.end_date|date:"l, F j, Y" }}
         · {{ event.venue.name }}, {{ event.venue.city }}
+        · Capacity: {{ event.capacity }}
     </p>
     <p style="margin: 1rem 0;">{{ event.description|linebreaks }}</p>
     <p style="font-size: 0.9rem; color: var(--text-muted);">
@@ -33,8 +34,10 @@
     {% if is_owner %}
     <p style="margin-top: 1.5rem;">
         <a href="{% url 'events:event_edit' pk=event.pk %}" class="btn">Edit event</a>
-        <a href="{% url 'events:event_sessions' pk=event.pk %}" class="btn btn-ghost" style="width: auto; margin-left: 0.5rem;">Sessions</a>
-        <a href="{% url 'events:event_delete' pk=event.pk %}" class="btn btn-ghost" style="width: auto; margin-left: 0.5rem;">Delete</a>
+        <a href="{% url 'event_tickets' pk=event.pk %}" class="btn btn-ghost"
+            style="width: auto; margin-left: 0.5rem;">Ticket Types</a>
+        <a href="{% url 'events:event_delete' pk=event.pk %}" class="btn btn-ghost"
+            style="width: auto; margin-left: 0.5rem;">Delete</a>
     </p>
     {% endif %}
 </article>

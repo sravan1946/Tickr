@@ -28,4 +28,5 @@ urlpatterns = [
     path("events/", include("events.urls")),
     path("categories/", CategoryListView.as_view(), name="category_list"),
     path("venues/", VenueListView.as_view(), name="venue_list"),
+    path("tickets/", include("tickets.urls")),
 ]

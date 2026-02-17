@@ -8,8 +8,8 @@ from accounts.models import OrganizerProfile
 from accounts.views import organizer_required
 from accounts.auth import get_request_user
 
-from .models import Event, EventSession, EventCategory, Venue
-from .forms import EventForm, EventSessionForm
+from .models import Event, EventCategory, Venue
+from .forms import EventForm
 
 
 def _get_organizer_profile(request: HttpRequest) -> OrganizerProfile | None:
@@ -142,45 +142,6 @@ class EventDeleteView(View):
         event.delete()
         messages.success(request, "Event deleted.")
         return redirect("events:event_list")
-
-
-class EventSessionListView(View):
-    """GET /events/<id>/sessions/ — list. POST /events/<id>/sessions/ — add session (per spec)."""
-
-    @method_decorator(organizer_required)
-    def get(self, request: HttpRequest, pk: str) -> HttpResponse:
-        event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
-            messages.error(request, "You can only manage sessions for your own events.")
-            return redirect("events:event_list")
-        sessions = event.sessions.order_by("start_time")
-        return render(
-            request,
-            "events/event_sessions.html",
-            {"event": event, "sessions": sessions, "form": EventSessionForm()},
-        )
-
-    @method_decorator(organizer_required)
-    def post(self, request: HttpRequest, pk: str) -> HttpResponse:
-        """POST /events/<id>/sessions/ — add session."""
-        event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
-            messages.error(request, "You can only add sessions to your own events.")
-            return redirect("events:event_list")
-        form = EventSessionForm(request.POST)
-        if not form.is_valid():
-            sessions = event.sessions.order_by("start_time")
-            return render(
-                request,
-                "events/event_sessions.html",
-                {"event": event, "sessions": sessions, "form": form},
-                status=400,
-            )
-        session = form.save(commit=False)
-        session.event = event
-        session.save()
-        messages.success(request, "Session added.")
-        return redirect("events:event_sessions", pk=event.pk)
 
 
 class CategoryListView(View):

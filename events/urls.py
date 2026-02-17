@@ -1,4 +1,5 @@
 from django.urls import path
+from tickets.views import TicketTypeListView
 
 from . import views
 
@@ -12,5 +13,5 @@ urlpatterns = [
     path("<slug:slug>/", views.EventDetailView.as_view(), name="event_detail"),
     path("<uuid:pk>/edit/", views.EventUpdateView.as_view(), name="event_edit"),
     path("<uuid:pk>/delete/", views.EventDeleteView.as_view(), name="event_delete"),
-    path("<uuid:pk>/sessions/", views.EventSessionListView.as_view(), name="event_sessions"),
+    path("<uuid:pk>/tickets/", TicketTypeListView.as_view(), name="event_tickets"),
 ]
