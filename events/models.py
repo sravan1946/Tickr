@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from accounts.models import OrganizerProfile
 
-# Create your models here.
+
 class EventCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150)
@@ -10,6 +10,7 @@ class EventCategory(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class Venue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -20,6 +21,7 @@ class Venue(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -38,6 +40,7 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
 
 class EventImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

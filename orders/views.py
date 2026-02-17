@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.db import transaction
 
 from accounts.auth import get_request_user
-from accounts.views import login_required
+from core.decorators import login_required
 from events.models import Event
 from tickets.models import TicketType, Ticket
 from promotions.models import PromoCode

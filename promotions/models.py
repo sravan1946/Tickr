@@ -29,7 +29,7 @@ class PromoCode(models.Model):
     def __str__(self) -> str:
         return f"{self.code} ({self.event.title})"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         self.code = self.code.upper()
         super().save(*args, **kwargs)
 

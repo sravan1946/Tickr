@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from django.db import models
 from accounts.models import User
 from events.models import Event
@@ -55,7 +56,7 @@ class OrderItem(models.Model):
         return f"{self.quantity}× {self.ticket_type.name} @ ${self.price_per_ticket}"
 
     @property
-    def subtotal(self):
+    def subtotal(self) -> Decimal:
         return self.quantity * self.price_per_ticket
 
 

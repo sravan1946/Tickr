@@ -108,7 +108,7 @@ class CheckInScanView(View):
         attendee = None
         try:
             attendee = ticket.attendee
-        except Exception:
+        except AttributeError:
             pass
 
         return render(request, "checkin/checkin_result.html", {

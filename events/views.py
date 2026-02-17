@@ -11,9 +11,6 @@ from .models import Event, EventCategory, Venue
 from .forms import EventForm
 
 
-event_owned_by_user = event_owned_by_user
-
-
 class EventListView(View):
     """GET /events/ — list. POST /events/ — create (organizer only, per spec)."""
 

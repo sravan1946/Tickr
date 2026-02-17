@@ -4,6 +4,7 @@ core.decorators — Shared view decorators for authentication & authorisation.
 Moved from accounts.views so that every app can import without depending
 on accounts' view layer.
 """
+import functools
 from typing import Callable, TypeVar
 
 from django.http import HttpRequest, HttpResponse
@@ -17,6 +18,7 @@ F = TypeVar("F", bound=Callable[..., HttpResponse])
 
 def login_required(f: F) -> F:
     """Decorator: redirect to login if no session user."""
+    @functools.wraps(f)
     def wrapped(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         if get_request_user(request) is None:
             messages.warning(request, "Please log in to continue.")
@@ -27,6 +29,7 @@ def login_required(f: F) -> F:
 
 def organizer_required(f: F) -> F:
     """Decorator: redirect if user is not an organizer."""
+    @functools.wraps(f)
     def wrapped(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
         user = get_request_user(request)
         if user is None:
