@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Promo Codes — {{ event.title }}{% endblock %}
+
+{% block nav %}
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <h1 style="margin-top: 0;">Promo Codes</h1>
+        <a href="{% url 'promotions:promocode_create' %}?event={{ event.pk }}" class="btn" style="width: auto;">+ New
+            Promo Code</a>
+    </div>
+    <p style="color: var(--text-muted);">Event: {{ event.title }}</p>
+
+    {% if promo_codes %}
+    <div style="margin: 1.5rem 0;">
+        {% for promo in promo_codes %}
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+                <h3 style="margin: 0 0 0.25rem 0;">
+                    <code>{{ promo.code }}</code>
+                    {% if not promo.is_valid %}
+                    <span style="color: var(--error); font-size: 0.8rem; font-weight: normal;">(inactive)</span>
+                    {% endif %}
+                </h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                    {% if promo.discount_type == "percentage" %}
+                    {{ promo.discount_value }}% off
+                    {% else %}
+                    ${{ promo.discount_value }} off
+                    {% endif %}
+                    &middot; Used {{ promo.used_count }}{% if promo.usage_limit %}/{{ promo.usage_limit }}{% endif %}
+                    {% if promo.expires_at %}
+                    &middot; Expires {{ promo.expires_at|date:"M j, Y g:i A" }}
+                    {% endif %}
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'promotions:promocode_update' pk=promo.pk %}" class="btn btn-ghost"
+                    style="width: auto;">Edit</a>
+                <a href="{% url 'promotions:promocode_delete' pk=promo.pk %}" class="btn btn-ghost"
+                    style="width: auto; color: var(--error);">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-muted); margin-top: 1rem;">No promo codes yet. Create one to get started.</p>
+    {% endif %}
+
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
+            event</a>
+    </p>
+</div>
+{% endblock %}

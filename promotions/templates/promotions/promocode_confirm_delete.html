@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Promo Code — {{ promo.code }}{% endblock %}
+
+{% block nav %}
+<a href="{% url 'event_promocode_list' pk=event.pk %}">Promo Codes</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Delete Promo Code</h1>
+    <p>Are you sure you want to delete the promo code <strong><code>{{ promo.code }}</code></strong>?</p>
+    <p style="color: var(--text-muted);">
+        {% if promo.discount_type == "percentage" %}
+        {{ promo.discount_value }}% off
+        {% else %}
+        ${{ promo.discount_value }} off
+        {% endif %}
+        &middot; Used {{ promo.used_count }} time{{ promo.used_count|pluralize }}
+    </p>
+
+    <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+        <form method="post" action="{% url 'promotions:promocode_delete' pk=promo.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="background: var(--error); width: auto;">Delete</button>
+        </form>
+        <a href="{% url 'event_promocode_list' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
+    </div>
+</div>
+{% endblock %}

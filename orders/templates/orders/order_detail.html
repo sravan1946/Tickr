@@ -31,6 +31,13 @@
                 <span style="color: var(--error); font-weight: 600;">Cancelled</span>
                 {% endif %}
             </p>
+            {% if order.promo_code %}
+            <p style="margin: 0.25rem 0; font-size: 0.9rem; color: var(--text-muted);">
+                Promo: <code>{{ order.promo_code.code }}</code>
+                ({% if order.promo_code.discount_type == "percentage" %}{{ order.promo_code.discount_value }}% off{%
+                else %}${{ order.promo_code.discount_value }} off{% endif %})
+            </p>
+            {% endif %}
         </div>
     </div>
 

@@ -39,6 +39,17 @@
             {% endfor %}
         </div>
 
+        {% if has_promo_codes %}
+        <div
+            style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; background: var(--surface, transparent);">
+            <label for="promo_code" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">Promo Code</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" name="promo_code" id="promo_code" class="form-input" placeholder="Enter promo code"
+                    style="flex: 1; text-transform: uppercase;">
+            </div>
+        </div>
+        {% endif %}
+
         <button type="submit" class="btn">Place Order</button>
     </form>
     {% else %}

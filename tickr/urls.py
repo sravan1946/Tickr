@@ -20,6 +20,7 @@ from django.urls import path, include
 from accounts.views import OrganizerProfileView
 from events.views import CategoryListView, VenueListView
 from orders.views import MyOrdersView
+from promotions.views import EventPromoCodeListView
 
 # URL structure matches tickr.md §4 API Endpoints.
 urlpatterns = [
@@ -32,4 +33,6 @@ urlpatterns = [
     path("tickets/", include("tickets.urls")),
     path("orders/", include("orders.urls")),
     path("my/orders/", MyOrdersView.as_view(), name="my_orders"),
+    path("promocodes/", include("promotions.urls")),
+    path("events/<uuid:pk>/promocodes/", EventPromoCodeListView.as_view(), name="event_promocode_list"),
 ]

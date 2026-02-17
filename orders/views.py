@@ -9,6 +9,7 @@ from accounts.auth import get_request_user
 from accounts.views import login_required
 from events.models import Event
 from tickets.models import TicketType, Ticket
+from promotions.models import PromoCode
 
 from .models import Order, OrderItem, Attendee
 from .forms import OrderTicketForm, AttendeeForm
@@ -52,6 +53,7 @@ class OrderCreateView(View):
         return render(request, "orders/order_create.html", {
             "event": event,
             "ticket_forms": forms,
+            "has_promo_codes": event.promo_codes.filter(is_active=True).exists(),
         })
 
     @method_decorator(login_required)
@@ -98,9 +100,21 @@ class OrderCreateView(View):
             messages.error(request, "Select at least one ticket.")
             return redirect(f"/orders/?event={event.pk}")
 
+        # Validate optional promo code
+        promo = None
+        promo_code_str = request.POST.get("promo_code", "").strip().upper()
+        if promo_code_str:
+            try:
+                promo = PromoCode.objects.get(code=promo_code_str, event=event)
+                if not promo.is_valid:
+                    messages.warning(request, "Promo code is expired or has reached its usage limit.")
+                    promo = None
+            except PromoCode.DoesNotExist:
+                messages.warning(request, "Invalid promo code — ignored.")
+
         # Create Order + OrderItems atomically
         with transaction.atomic():
-            order = Order.objects.create(user=user, event=event)
+            order = Order.objects.create(user=user, event=event, promo_code=promo)
             for tt, qty in items_to_create:
                 OrderItem.objects.create(
                     order=order,
@@ -110,7 +124,15 @@ class OrderCreateView(View):
                 )
             order.recalculate_total()
 
-        messages.success(request, "Order created! Review and confirm below.")
+            # Apply promo discount to total
+            if promo:
+                order.total_amount = promo.apply_discount(order.total_amount)
+                order.save(update_fields=["total_amount"])
+
+        if promo:
+            messages.success(request, f"Order created with promo code '{promo.code}' applied!")
+        else:
+            messages.success(request, "Order created! Review and confirm below.")
         return redirect("orders:order_detail", pk=order.pk)
 
 
@@ -191,6 +213,11 @@ class OrderConfirmView(View):
 
             order.status = "paid"
             order.save(update_fields=["status"])
+
+            # Increment promo code usage
+            if order.promo_code:
+                order.promo_code.used_count += 1
+                order.promo_code.save(update_fields=["used_count"])
 
         messages.success(request, "Order confirmed! Your tickets have been issued.")
         return redirect("orders:order_detail", pk=order.pk)
