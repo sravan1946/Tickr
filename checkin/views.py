@@ -5,34 +5,13 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 
 from accounts.auth import get_request_user
-from accounts.models import OrganizerProfile
-from accounts.views import organizer_required
+from core.decorators import organizer_required
+from core.helpers import get_organizer_profile, event_owned_by_user
 from events.models import Event
 from tickets.models import Ticket
 
 from .models import CheckIn
 from .forms import CheckInForm
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def _get_organizer_profile(request: HttpRequest) -> OrganizerProfile | None:
-    """Return OrganizerProfile for current user or None."""
-    user = get_request_user(request)
-    if not user or not getattr(user, "is_organizer", False):
-        return None
-    try:
-        return user.organizer_profile
-    except Exception:
-        return None
-
-
-def _event_owned_by_user(request: HttpRequest, event: Event) -> bool:
-    """Return True if the current user's organizer profile owns this event."""
-    profile = _get_organizer_profile(request)
-    return profile is not None and event.organizer_id == profile.pk
 
 
 # ---------------------------------------------------------------------------
@@ -48,7 +27,7 @@ class CheckInScanView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only check in tickets for your own events.")
             return redirect("events:event_list")
 
@@ -69,7 +48,7 @@ class CheckInScanView(View):
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only check in tickets for your own events.")
             return redirect("events:event_list")
 
@@ -152,7 +131,7 @@ class CheckInListView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only view check-ins for your own events.")
             return redirect("events:event_list")
 

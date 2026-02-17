@@ -1,5 +1,3 @@
-from typing import Callable, TypeVar
-
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
@@ -11,31 +9,7 @@ from .models import User, OrganizerProfile
 from .forms import LoginForm, RegisterForm, OrganizerProfileForm
 from .auth import get_request_user, login_user, logout_user
 
-F = TypeVar("F", bound=Callable[..., HttpResponse])
-
-
-def login_required(f: F) -> F:
-    """Decorator: redirect to login if no session user."""
-    def wrapped(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        if get_request_user(request) is None:
-            messages.warning(request, "Please log in to continue.")
-            return redirect("accounts:login")
-        return f(request, *args, **kwargs)
-    return wrapped  # type: ignore[return-value]
-
-
-def organizer_required(f: F) -> F:
-    """Decorator: redirect if user is not an organizer."""
-    def wrapped(request: HttpRequest, *args: object, **kwargs: object) -> HttpResponse:
-        user = get_request_user(request)
-        if user is None:
-            messages.warning(request, "Please log in to continue.")
-            return redirect("accounts:login")
-        if not getattr(user, "is_organizer", False):
-            messages.error(request, "Organizer access required.")
-            return redirect("accounts:me")
-        return f(request, *args, **kwargs)
-    return wrapped  # type: ignore[return-value]
+from core.decorators import login_required, organizer_required
 
 
 class LoginView(View):

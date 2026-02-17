@@ -4,29 +4,14 @@ from django.views import View
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 
-from accounts.models import OrganizerProfile
-from accounts.views import organizer_required
-from accounts.auth import get_request_user
+from core.decorators import organizer_required
+from core.helpers import get_organizer_profile, event_owned_by_user
 
 from .models import Event, EventCategory, Venue
 from .forms import EventForm
 
 
-def _get_organizer_profile(request: HttpRequest) -> OrganizerProfile | None:
-    """Return OrganizerProfile for current user or None."""
-    user = get_request_user(request)
-    if not user or not getattr(user, "is_organizer", False):
-        return None
-    try:
-        return user.organizer_profile
-    except Exception:
-        return None
-
-
-def _event_owned_by_user(request: HttpRequest, event: Event) -> bool:
-    """Return True if the current user's organizer profile owns this event."""
-    profile = _get_organizer_profile(request)
-    return profile is not None and event.organizer_id == profile.pk
+event_owned_by_user = event_owned_by_user
 
 
 class EventListView(View):
@@ -36,7 +21,7 @@ class EventListView(View):
         events = Event.objects.filter(is_published=True, is_cancelled=False).order_by(
             "-start_date"
         )
-        organizer_profile = _get_organizer_profile(request)
+        organizer_profile = get_organizer_profile(request)
         my_events: list[Event] = []
         if organizer_profile:
             my_events = list(
@@ -54,7 +39,7 @@ class EventListView(View):
 
     def post(self, request: HttpRequest) -> HttpResponse:
         """POST /events/ — create event (organizer only)."""
-        organizer_profile = _get_organizer_profile(request)
+        organizer_profile = get_organizer_profile(request)
         if not organizer_profile:
             messages.error(request, "Organizer access required.")
             return redirect("events:event_list")
@@ -73,7 +58,7 @@ class EventDetailView(View):
 
     def get(self, request: HttpRequest, slug: str) -> HttpResponse:
         event = get_object_or_404(Event, slug=slug)
-        is_owner = _event_owned_by_user(request, event)
+        is_owner = event_owned_by_user(request, event)
         if not event.is_published and not is_owner:
             return redirect("events:event_list")
         has_tickets = event.ticket_types.filter(is_active=True).exists()
@@ -98,7 +83,7 @@ class EventUpdateView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only edit your own events.")
             return redirect("events:event_list")
         form = EventForm(instance=event)
@@ -107,7 +92,7 @@ class EventUpdateView(View):
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only edit your own events.")
             return redirect("events:event_list")
         form = EventForm(request.POST, instance=event)
@@ -129,7 +114,7 @@ class EventDeleteView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only delete your own events.")
             return redirect("events:event_list")
         return render(request, "events/event_confirm_delete.html", {"event": event})
@@ -137,7 +122,7 @@ class EventDeleteView(View):
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        if not _event_owned_by_user(request, event):
+        if not event_owned_by_user(request, event):
             messages.error(request, "You can only delete your own events.")
             return redirect("events:event_list")
         event.delete()

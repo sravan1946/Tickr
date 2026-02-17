@@ -41,7 +41,7 @@ tickr/
 ├── orders/            # Orders, order items, attendees
 ├── promotions/        # Promo codes (CRUD + validation)
 ├── checkin/           # Check-in system (scan, validate, stats)
-├── core/              # Shared utilities (stub — not yet implemented)
+├── core/              # Shared utilities (decorators, helpers, mixins, template tags)
 ├── templates/         # Global templates (base.html, includes/)
 └── static/            # Static assets (CSS/JS)
 ```
@@ -399,7 +399,7 @@ erDiagram
 | 4 | `orders` | ✅ Complete |
 | 5 | `promotions` | ✅ Complete |
 | 6 | `checkin` | ✅ Complete |
-| 7 | `core` | ⬜ Not started (app created, no models/views) |
+| 7 | `core` | ✅ Complete |
 
 ---
 

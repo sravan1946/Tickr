@@ -4,34 +4,12 @@ from django.views import View
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 
-from accounts.auth import get_request_user
-from accounts.models import OrganizerProfile
-from accounts.views import login_required, organizer_required
+from core.decorators import login_required, organizer_required
+from core.helpers import get_organizer_profile, promo_owned_by_user
 from events.models import Event
 
 from .models import PromoCode
 from .forms import PromoCodeForm, PromoCodeValidateForm
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def _get_organizer_profile(request: HttpRequest) -> OrganizerProfile | None:
-    """Return OrganizerProfile for current user or None."""
-    user = get_request_user(request)
-    if not user or not getattr(user, "is_organizer", False):
-        return None
-    try:
-        return user.organizer_profile
-    except Exception:
-        return None
-
-
-def _promo_owned_by_user(request: HttpRequest, promo: PromoCode) -> bool:
-    """Return True if the current user's organizer profile owns the promo's event."""
-    profile = _get_organizer_profile(request)
-    return profile is not None and promo.event.organizer_id == profile.pk
 
 
 # ---------------------------------------------------------------------------
@@ -52,7 +30,7 @@ class PromoCodeCreateView(View):
             return redirect("events:event_list")
 
         event = get_object_or_404(Event, pk=event_id)
-        profile = _get_organizer_profile(request)
+        profile = get_organizer_profile(request)
         if not profile or event.organizer_id != profile.pk:
             messages.error(request, "You can only manage promo codes for your own events.")
             return redirect("events:event_list")
@@ -71,7 +49,7 @@ class PromoCodeCreateView(View):
             return redirect("events:event_list")
 
         event = get_object_or_404(Event, pk=event_id)
-        profile = _get_organizer_profile(request)
+        profile = get_organizer_profile(request)
         if not profile or event.organizer_id != profile.pk:
             messages.error(request, "You can only manage promo codes for your own events.")
             return redirect("events:event_list")
@@ -100,7 +78,7 @@ class PromoCodeUpdateView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         promo = get_object_or_404(PromoCode, pk=pk)
-        if not _promo_owned_by_user(request, promo):
+        if not promo_owned_by_user(request, promo):
             messages.error(request, "You can only edit your own promo codes.")
             return redirect("events:event_list")
 
@@ -114,7 +92,7 @@ class PromoCodeUpdateView(View):
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
         promo = get_object_or_404(PromoCode, pk=pk)
-        if not _promo_owned_by_user(request, promo):
+        if not promo_owned_by_user(request, promo):
             messages.error(request, "You can only edit your own promo codes.")
             return redirect("events:event_list")
 
@@ -141,7 +119,7 @@ class PromoCodeDeleteView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         promo = get_object_or_404(PromoCode, pk=pk)
-        if not _promo_owned_by_user(request, promo):
+        if not promo_owned_by_user(request, promo):
             messages.error(request, "You can only delete your own promo codes.")
             return redirect("events:event_list")
 
@@ -153,7 +131,7 @@ class PromoCodeDeleteView(View):
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
         promo = get_object_or_404(PromoCode, pk=pk)
-        if not _promo_owned_by_user(request, promo):
+        if not promo_owned_by_user(request, promo):
             messages.error(request, "You can only delete your own promo codes.")
             return redirect("events:event_list")
 
@@ -223,7 +201,7 @@ class EventPromoCodeListView(View):
     @method_decorator(organizer_required)
     def get(self, request: HttpRequest, pk: str) -> HttpResponse:
         event = get_object_or_404(Event, pk=pk)
-        profile = _get_organizer_profile(request)
+        profile = get_organizer_profile(request)
         if not profile or event.organizer_id != profile.pk:
             messages.error(request, "You can only view promo codes for your own events.")
             return redirect("events:event_list")
