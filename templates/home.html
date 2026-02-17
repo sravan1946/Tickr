@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to Tickr!</h1>
+        <p class="lead">Your one-stop shop for all events and tickets.</p>
+        <hr class="my-4">
+        <p>Browse events, buy tickets, and enjoy the show.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'events:event_list' %}" role="button">Browse Events</a>
+    </div>
+</div>
+{% endblock %}

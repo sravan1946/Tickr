@@ -18,7 +18,7 @@ class LoginView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
             return redirect("accounts:me")
-        return render(request, "accounts/login.html", {"form": LoginForm()})
+        return render(request, "accounts/login.html", {"form": LoginForm(), "next": request.GET.get("next")})
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = LoginForm(request.POST)
@@ -39,7 +39,7 @@ class LoginView(View):
             return render(request, "accounts/login.html", {"form": LoginForm(request.POST)})
         login_user(request, user)
         messages.success(request, f"Welcome back, {user.username}.")
-        next_url = request.GET.get("next")
+        next_url = request.POST.get("next")
         if next_url and next_url.startswith("/") and not next_url.startswith("//"):
             return redirect(next_url)
         return redirect("accounts:me")
@@ -65,7 +65,7 @@ class RegisterView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
             return redirect("accounts:me")
-        return render(request, "accounts/register.html", {"form": RegisterForm()})
+        return render(request, "accounts/register.html", {"form": RegisterForm(), "next": request.GET.get("next")})
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = RegisterForm(request.POST)
@@ -79,6 +79,9 @@ class RegisterView(View):
         user.save()
         login_user(request, user)
         messages.success(request, "Account created. Welcome to Tickr!")
+        next_url = request.POST.get("next")
+        if next_url and next_url.startswith("/") and not next_url.startswith("//"):
+            return redirect(next_url)
         return redirect("accounts:me")
 
 

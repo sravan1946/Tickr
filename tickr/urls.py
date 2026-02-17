@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 from accounts.views import OrganizerProfileView
+from core.views import HomeView
 from events.views import CategoryListView, VenueListView
 from orders.views import MyOrdersView
 from promotions.views import EventPromoCodeListView
 
 # URL structure matches tickr.md §4 API Endpoints.
 urlpatterns = [
+    path("", HomeView.as_view(), name="home"),
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
     path("organizer/profile/", OrganizerProfileView.as_view(), name="organizer_profile"),

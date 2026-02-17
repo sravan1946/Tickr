@@ -5,19 +5,23 @@
 {% block content %}
 <div class="card">
     <h1 style="margin-top:0;">Create account</h1>
-    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Join Tickr to discover events and manage your tickets.</p>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Join Tickr to discover events and manage your tickets.
+    </p>
     <form method="post" action="{% url 'accounts:register' %}">
         {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
         {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
         {% endfor %}
         <button type="submit" class="btn">Register</button>
     </form>
     <p style="margin-top: 1rem; text-align: center;">
-        Already have an account? <a href="{% url 'accounts:login' %}">Log in</a>
+        Already have an account? <a href="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}">Log in</a>
     </p>
 </div>
 {% endblock %}
