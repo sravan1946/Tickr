@@ -76,10 +76,11 @@ class EventDetailView(View):
         is_owner = _event_owned_by_user(request, event)
         if not event.is_published and not is_owner:
             return redirect("events:event_list")
+        has_tickets = event.ticket_types.filter(is_active=True).exists()
         return render(
             request,
             "events/event_detail.html",
-            {"event": event, "is_owner": is_owner},
+            {"event": event, "is_owner": is_owner, "has_tickets": has_tickets},
         )
 
 

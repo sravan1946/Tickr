@@ -23,7 +23,6 @@
             {% if not event.is_published %}<span style="color: var(--text-muted); font-size: 0.85rem;"> (draft)</span>{% endif %}
             —
             <a href="{% url 'events:event_edit' pk=event.pk %}">Edit</a>
-            <a href="{% url 'events:event_sessions' pk=event.pk %}">Sessions</a>
         </li>
         {% endfor %}
     </ul>

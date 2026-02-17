@@ -1,11 +1,16 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Edit Ticket Type — {{ event.title }}{% endblock %}
 
 {% block nav %}
-    <a href="{% url 'events:event_list' %}">Events</a>
-    <a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
-    <a href="{% url 'event_tickets' pk=event.pk %}">Ticket Types</a>
+<a href="{% url 'events:event_list' %}">Events</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'events:event_tickets' pk=event.pk %}">Ticket Types</a>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,15 +19,28 @@
     <form method="post" action="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}">
         {% csrf_token %}
         {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% if field.name == "sale_start" %}
+        {# ── calendar date-range picker ────── #}
+        {% with end_field=form.sale_end %}
+        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field start_label="Sale Start" end_label="Sale End" %}
+        {% endwith %}
+        {% elif field.name == "sale_end" %}
+        {# Skip, handled with sale_start #}
+        {% else %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% endif %}
         {% endfor %}
         <button type="submit" class="btn">Update ticket type</button>
     </form>
     <p style="margin-top: 1rem;">
-        <a href="{% url 'event_tickets' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
+        <a href="{% url 'events:event_tickets' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
     </p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

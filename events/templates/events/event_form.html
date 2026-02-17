@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{% if event %}Edit{% else %}Create{% endif %} event{% endblock %}
 
 {% block nav %}
-    <a href="{% url 'events:event_list' %}">Events</a>
+<a href="{% url 'events:event_list' %}">Events</a>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -12,10 +17,20 @@
     <form method="post" action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_list' %}{% endif %}">
         {% csrf_token %}
         {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% if field.name == "start_date" %}
+        {# ── calendar date-range picker ────── #}
+        {# We skip end_date in the loop because it's handled here #}
+        {% with end_field=form.end_date %}
+        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field %}
+        {% endwith %}
+        {% elif field.name == "end_date" %}
+        {# Skip, handled with start_date #}
+        {% else %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% endif %}
         {% endfor %}
         <button type="submit" class="btn">{% if event %}Update{% else %}Create{% endif %} event</button>
     </form>
@@ -23,4 +38,8 @@
         <a href="{% url 'events:event_list' %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
     </p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

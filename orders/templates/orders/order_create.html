@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Book Tickets — {{ event.title }}{% endblock %}
+
+{% block nav %}
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Book Tickets — {{ event.title }}</h1>
+    <p style="color: var(--text-muted);">
+        {{ event.start_date|date:"M j, Y g:i A" }} — {{ event.end_date|date:"M j, Y g:i A" }}<br>
+        {{ event.venue.name }}, {{ event.venue.city }}
+    </p>
+
+    {% if ticket_forms %}
+    <form method="post" action="{% url 'orders:order_create' %}">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.pk }}">
+
+        <div style="margin: 1.5rem 0;">
+            {% for entry in ticket_forms %}
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem;">
+                <div>
+                    <h3 style="margin: 0 0 0.25rem 0;">{{ entry.ticket_type.name }}</h3>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                        ${{ entry.ticket_type.price }} &middot;
+                        {{ entry.ticket_type.quantity_available }} available
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    {{ entry.form.ticket_type_id }}
+                    <label for="id_quantity" style="margin: 0; font-weight: 600;">Qty:</label>
+                    {{ entry.form.quantity }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn">Place Order</button>
+    </form>
+    {% else %}
+    <p style="color: var(--text-muted); margin-top: 1rem;">
+        No ticket types are currently on sale for this event.
+    </p>
+    {% endif %}
+
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
+            event</a>
+    </p>
+</div>
+{% endblock %}

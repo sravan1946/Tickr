@@ -1,0 +1,58 @@
+{% load static %}
+{% comment %}
+Re-usable Date Range Picker
+
+Arguments:
+- start_field: The form field for start date
+- end_field: The form field for end date
+- start_label: (Optional) Label for start date
+- end_label: (Optional) Label for end date
+{% endcomment %}
+
+<div class="date-range-wrap" id="picker-{{ start_field.auto_id }}">
+
+    {# Start Date Column #}
+    <div class="date-col">
+        <label>{{ start_label|default:"Start date & time" }}</label>
+        <div class="cal" id="cal-start-{{ start_field.auto_id }}"></div>
+        <div class="time-row">
+            <input type="time" id="time-start-{{ start_field.auto_id }}" value="09:00">
+        </div>
+        <span class="fallback-toggle"
+            onclick="document.getElementById('fb-start-{{ start_field.auto_id }}').classList.toggle('show')">type
+            manually ▾</span>
+        <div class="native-fallback" id="fb-start-{{ start_field.auto_id }}">
+            {{ start_field }}
+            {{ start_field.errors }}
+        </div>
+    </div>
+
+    {# End Date Column #}
+    <div class="date-col">
+        <label>{{ end_label|default:"End date & time" }}</label>
+        <div class="cal" id="cal-end-{{ end_field.auto_id }}"></div>
+        <div class="time-row">
+            <input type="time" id="time-end-{{ end_field.auto_id }}" value="17:00">
+        </div>
+        <span class="fallback-toggle"
+            onclick="document.getElementById('fb-end-{{ end_field.auto_id }}').classList.toggle('show')">type manually
+            ▾</span>
+        <div class="native-fallback" id="fb-end-{{ end_field.auto_id }}">
+            {{ end_field }}
+            {{ end_field.errors }}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new DateRangePicker({
+            startInputId: '{{ start_field.auto_id }}',
+            endInputId: '{{ end_field.auto_id }}',
+            containerStartId: 'cal-start-{{ start_field.auto_id }}',
+            containerEndId: 'cal-end-{{ end_field.auto_id }}',
+            timeStartId: 'time-start-{{ start_field.auto_id }}',
+            timeEndId: 'time-end-{{ end_field.auto_id }}'
+        });
+    });
+</script>

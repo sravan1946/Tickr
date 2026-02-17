@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Add Attendees — Order{% endblock %}
+
+{% block nav %}
+<a href="{% url 'orders:order_detail' pk=order.pk %}">Order</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Add Attendees</h1>
+    <p style="color: var(--text-muted);">
+        Order for <strong>{{ event.title }}</strong> — provide attendee details for each ticket.
+    </p>
+
+    <form method="post" action="{% url 'orders:order_attendees' pk=order.pk %}">
+        {% csrf_token %}
+
+        {% for entry in items_with_forms %}
+        <div style="margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 4px;">
+            <h3 style="margin: 0 0 0.75rem 0;">{{ entry.item.ticket_type.name }} ({{ entry.item.quantity }}×)</h3>
+
+            {% if entry.existing %}
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">Already registered:</p>
+            {% for att in entry.existing %}
+            <p style="margin: 0.25rem 0; font-size: 0.9rem;">✓ {{ att.full_name }} ({{ att.email }})</p>
+            {% endfor %}
+            {% endif %}
+
+            {% if entry.forms %}
+            <p style="font-size: 0.9rem; margin: 0.75rem 0 0.5rem 0;">New attendees ({{ entry.needed }} remaining):</p>
+            {% for form in entry.forms %}
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                {{ form.full_name }}
+                {{ form.email }}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p style="font-size: 0.9rem; color: var(--success); margin: 0.5rem 0 0 0;">All attendees registered.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Save Attendees</button>
+    </form>
+
+    <p style="margin-top: 1.5rem;">
+        <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn btn-ghost" style="width: auto;">Back to
+            order</a>
+    </p>
+</div>
+{% endblock %}

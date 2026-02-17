@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">My Orders</h1>
+
+    {% if orders %}
+    <ul style="list-style: none; padding: 0; margin: 1rem 0 0 0;">
+        {% for order in orders %}
+        <li style="padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h3 style="margin: 0 0 0.25rem 0;">
+                        <a href="{% url 'orders:order_detail' pk=order.pk %}">{{ order.event.title }}</a>
+                    </h3>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                        {{ order.created_at|date:"M j, Y g:i A" }}
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-weight: 700;">${{ order.total_amount }}</p>
+                    <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">
+                        {% if order.status == "pending" %}
+                        <span style="color: var(--accent);">Pending</span>
+                        {% elif order.status == "paid" %}
+                        <span style="color: var(--success);">Paid</span>
+                        {% elif order.status == "cancelled" %}
+                        <span style="color: var(--error);">Cancelled</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--text-muted); margin-top: 1rem;">
+        You haven't placed any orders yet. <a href="{% url 'events:event_list' %}">Browse events</a> to get started.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

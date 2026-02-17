@@ -1,25 +1,39 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Ticket Types — {{ event.title }}{% endblock %}
 
 {% block nav %}
-    <a href="{% url 'events:event_list' %}">Events</a>
-    <a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'events:event_list' %}">Events</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="card">
     <h1 style="margin-top: 0;">Ticket Types — {{ event.title }}</h1>
-    
+
     {% if is_owner %}
     <p style="margin-bottom: 1rem;">Add a ticket type (POST /events/&lt;id&gt;/tickets/):</p>
-    <form method="post" action="{% url 'event_tickets' pk=event.pk %}">
+    <form method="post" action="{% url 'events:event_tickets' pk=event.pk %}">
         {% csrf_token %}
         {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-            {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% if field.name == "sale_start" %}
+        {# ── calendar date-range picker ────── #}
+        {% with end_field=form.sale_end %}
+        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field start_label="Sale Start" end_label="Sale End" %}
+        {% endwith %}
+        {% elif field.name == "sale_end" %}
+        {# Skip, handled with sale_start #}
+        {% else %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% endif %}
         {% endfor %}
         <button type="submit" class="btn">Create ticket type</button>
     </form>
@@ -38,20 +52,22 @@
                             Price: ${{ ticket_type.price }}<br>
                             Available: {{ ticket_type.quantity_available }} / {{ ticket_type.quantity_total }}<br>
                             Sale period: {{ ticket_type.sale_start|date:"M j, Y g:i A" }} – {{ ticket_type.sale_end|date:"M j, Y g:i A" }}<br>
-                            Status: 
+                            Status:
                             {% if ticket_type.is_on_sale %}
-                                <span style="color: var(--success);">On Sale</span>
+                            <span style="color: var(--success);">On Sale</span>
                             {% elif not ticket_type.is_active %}
-                                <span style="color: var(--text-muted);">Inactive</span>
+                            <span style="color: var(--text-muted);">Inactive</span>
                             {% else %}
-                                <span style="color: var(--text-muted);">Not on sale</span>
+                            <span style="color: var(--text-muted);">Not on sale</span>
                             {% endif %}
                         </p>
                     </div>
                     {% if is_owner %}
                     <div style="display: flex; gap: 0.5rem;">
-                        <a href="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="btn btn-ghost" style="width: auto; padding: 0.5rem 1rem;">Edit</a>
-                        <a href="{% url 'tickets:ticket_type_delete' pk=ticket_type.pk %}" class="btn btn-ghost" style="width: auto; padding: 0.5rem 1rem; color: var(--error);">Delete</a>
+                        <a href="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="btn btn-ghost"
+                            style="width: auto; padding: 0.5rem 1rem;">Edit</a>
+                        <a href="{% url 'tickets:ticket_type_delete' pk=ticket_type.pk %}" class="btn btn-ghost"
+                            style="width: auto; padding: 0.5rem 1rem; color: var(--error);">Delete</a>
                     </div>
                     {% endif %}
                 </div>
@@ -62,15 +78,20 @@
     {% else %}
     <p style="color: var(--text-muted); margin-top: 1rem;">
         {% if is_owner %}
-            No ticket types yet. Create one to start selling tickets.
+        No ticket types yet. Create one to start selling tickets.
         {% else %}
-            No ticket types available for this event.
+        No ticket types available for this event.
         {% endif %}
     </p>
     {% endif %}
 
     <p style="margin-top: 1.5rem;">
-        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to event</a>
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
+            event</a>
     </p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.pk|truncatechars:8 }}{% endblock %}
+
+{% block nav %}
+<a href="{% url 'my_orders' %}">My Orders</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top: 0;">Order Details</h1>
+
+    <div
+        style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <p style="margin: 0.25rem 0;"><strong>Event:</strong> <a
+                    href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a></p>
+            <p style="margin: 0.25rem 0;"><strong>Date:</strong> {{ event.start_date|date:"M j, Y g:i A" }}</p>
+            <p style="margin: 0.25rem 0;"><strong>Order ID:</strong> <code>{{ order.pk }}</code></p>
+            <p style="margin: 0.25rem 0;"><strong>Placed:</strong> {{ order.created_at|date:"M j, Y g:i A" }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="margin: 0.25rem 0; font-size: 1.25rem; font-weight: 700;">${{ order.total_amount }}</p>
+            <p style="margin: 0.25rem 0;">
+                Status:
+                {% if order.status == "pending" %}
+                <span style="color: var(--accent); font-weight: 600;">Pending</span>
+                {% elif order.status == "paid" %}
+                <span style="color: var(--success); font-weight: 600;">Paid</span>
+                {% elif order.status == "cancelled" %}
+                <span style="color: var(--error); font-weight: 600;">Cancelled</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <h2>Items</h2>
+    <div style="margin: 1rem 0;">
+        {% for item in items %}
+        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <h3 style="margin: 0 0 0.25rem 0;">{{ item.ticket_type.name }}</h3>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                        {{ item.quantity }}× @ ${{ item.price_per_ticket }} = <strong>${{ item.subtotal }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            {% if item.attendee_list %}
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                <p style="margin: 0 0 0.5rem 0; font-weight: 600; font-size: 0.9rem;">Attendees:</p>
+                {% for att in item.attendee_list %}
+                <p style="margin: 0.25rem 0; font-size: 0.9rem; color: var(--text-muted);">
+                    {{ att.full_name }} ({{ att.email }})
+                    {% if att.ticket %}
+                    — Ticket: <a
+                        href="{% url 'tickets:ticket_detail' code=att.ticket.code %}"><code>{{ att.ticket.code }}</code></a>
+                    {% endif %}
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem;">
+        {% if order.status == "pending" %}
+        <a href="{% url 'orders:order_attendees' pk=order.pk %}" class="btn btn-ghost" style="width: auto;">Add
+            Attendees</a>
+        <form method="post" action="{% url 'orders:order_confirm' pk=order.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn" style="width: auto;">Confirm &amp; Pay</button>
+        </form>
+        <form method="post" action="{% url 'orders:order_cancel' pk=order.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost" style="width: auto; color: var(--error);">Cancel Order</button>
+        </form>
+        {% elif order.status == "paid" %}
+        <a href="{% url 'orders:order_attendees' pk=order.pk %}" class="btn btn-ghost" style="width: auto;">Manage
+            Attendees</a>
+        <form method="post" action="{% url 'orders:order_cancel' pk=order.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost" style="width: auto; color: var(--error);">Cancel Order</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'my_orders' %}" class="btn btn-ghost" style="width: auto;">All My Orders</a>
+    </div>
+</div>
+{% endblock %}

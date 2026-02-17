@@ -42,12 +42,12 @@ class TicketTypeListView(View):
         event = get_object_or_404(Event, pk=pk)
         ticket_types = event.ticket_types.all()
         is_owner = _event_owned_by_user(request, event)
-        
+
         # Only show unpublished events to owners
         if not event.is_published and not is_owner:
             messages.error(request, "Event not found.")
             return redirect("events:event_list")
-        
+
         return render(
             request,
             "tickets/ticket_type_list.html",
@@ -66,7 +66,7 @@ class TicketTypeListView(View):
         if not _event_owned_by_user(request, event):
             messages.error(request, "You can only create ticket types for your own events.")
             return redirect("events:event_detail", slug=event.slug)
-        
+
         form = TicketTypeForm(request.POST)
         if not form.is_valid():
             ticket_types = event.ticket_types.all()
@@ -81,12 +81,12 @@ class TicketTypeListView(View):
                 },
                 status=400,
             )
-        
+
         ticket_type = form.save(commit=False)
         ticket_type.event = event
         ticket_type.save()
         messages.success(request, "Ticket type created.")
-        return redirect("event_tickets", pk=event.pk)
+        return redirect("events:event_tickets", pk=event.pk)
 
 
 class TicketTypeUpdateView(View):
@@ -98,7 +98,7 @@ class TicketTypeUpdateView(View):
         if not _ticket_type_owned_by_user(request, ticket_type):
             messages.error(request, "You can only edit ticket types for your own events.")
             return redirect("events:event_list")
-        
+
         form = TicketTypeForm(instance=ticket_type)
         return render(
             request,
@@ -112,7 +112,7 @@ class TicketTypeUpdateView(View):
         if not _ticket_type_owned_by_user(request, ticket_type):
             messages.error(request, "You can only edit ticket types for your own events.")
             return redirect("events:event_list")
-        
+
         form = TicketTypeForm(request.POST, instance=ticket_type)
         if not form.is_valid():
             return render(
@@ -121,10 +121,10 @@ class TicketTypeUpdateView(View):
                 {"form": form, "ticket_type": ticket_type, "event": ticket_type.event},
                 status=400,
             )
-        
+
         form.save()
         messages.success(request, "Ticket type updated.")
-        return redirect("event_tickets", pk=ticket_type.event.pk)
+        return redirect("events:event_tickets", pk=ticket_type.event.pk)
 
 
 class TicketTypeDeleteView(View):
@@ -136,7 +136,7 @@ class TicketTypeDeleteView(View):
         if not _ticket_type_owned_by_user(request, ticket_type):
             messages.error(request, "You can only delete ticket types for your own events.")
             return redirect("events:event_list")
-        
+
         return render(
             request,
             "tickets/ticket_type_confirm_delete.html",
@@ -149,11 +149,11 @@ class TicketTypeDeleteView(View):
         if not _ticket_type_owned_by_user(request, ticket_type):
             messages.error(request, "You can only delete ticket types for your own events.")
             return redirect("events:event_list")
-        
+
         event_pk = ticket_type.event.pk
         ticket_type.delete()
         messages.success(request, "Ticket type deleted.")
-        return redirect("event_tickets", pk=event_pk)
+        return redirect("events:event_tickets", pk=event_pk)
 
 
 class TicketDetailView(View):
@@ -163,7 +163,7 @@ class TicketDetailView(View):
         ticket = get_object_or_404(Ticket, code=code)
         event = ticket.ticket_type.event
         is_owner = _event_owned_by_user(request, event)
-        
+
         return render(
             request,
             "tickets/ticket_detail.html",
