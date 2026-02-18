@@ -3,50 +3,72 @@
 {% block title %}Add Attendees — Order{% endblock %}
 
 {% block nav %}
-<a href="{% url 'orders:order_detail' pk=order.pk %}">Order</a>
+<a href="{% url 'orders:order_detail' pk=order.pk %}" class="nav-link text-sm font-medium">Order</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">Add Attendees</h1>
-    <p style="color: var(--text-muted);">
-        Order for <strong>{{ event.title }}</strong> — provide attendee details for each ticket.
-    </p>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        <h1 class="text-3xl font-display font-bold text-white mb-2">Add Attendees</h1>
+        <p class="text-gray-400 mb-8">
+            Order for <strong class="text-neon-cyan">{{ event.title }}</strong> — provide attendee details for each ticket.
+        </p>
 
-    <form method="post" action="{% url 'orders:order_attendees' pk=order.pk %}">
-        {% csrf_token %}
+        <form method="post" action="{% url 'orders:order_attendees' pk=order.pk %}">
+            {% csrf_token %}
 
-        {% for entry in items_with_forms %}
-        <div style="margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 4px;">
-            <h3 style="margin: 0 0 0.75rem 0;">{{ entry.item.ticket_type.name }} ({{ entry.item.quantity }}×)</h3>
+            {% for entry in items_with_forms %}
+            <div class="border border-white/10 rounded-xl p-5 bg-dark-800/50 mb-6">
+                <h3 class="text-lg font-semibold text-white mb-4">{{ entry.item.ticket_type.name }} ({{ entry.item.quantity }}×)</h3>
 
-            {% if entry.existing %}
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">Already registered:</p>
-            {% for att in entry.existing %}
-            <p style="margin: 0.25rem 0; font-size: 0.9rem;">✓ {{ att.full_name }} ({{ att.email }})</p>
-            {% endfor %}
-            {% endif %}
+                {% if entry.existing %}
+                <p class="text-sm text-gray-400 mb-3">Already registered:</p>
+                {% for att in entry.existing %}
+                <p class="text-sm text-gray-300 mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {{ att.full_name }} ({{ att.email }})
+                </p>
+                {% endfor %}
+                {% endif %}
 
-            {% if entry.forms %}
-            <p style="font-size: 0.9rem; margin: 0.75rem 0 0.5rem 0;">New attendees ({{ entry.needed }} remaining):</p>
-            {% for form in entry.forms %}
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                {{ form.full_name }}
-                {{ form.email }}
+                {% if entry.forms %}
+                <p class="text-sm text-white mt-4 mb-3">New attendees ({{ entry.needed }} remaining):</p>
+                {% for form in entry.forms %}
+                <div class="flex flex-col sm:flex-row gap-3 mb-3">
+                    <input type="text" name="{{ form.full_name.name }}" placeholder="Full Name" 
+                        class="input-field flex-1 px-4 py-2.5 rounded-lg text-sm" required>
+                    <input type="email" name="{{ form.email.name }}" placeholder="Email Address" 
+                        class="input-field flex-1 px-4 py-2.5 rounded-lg text-sm" required>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-sm text-green-400 mt-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    All attendees registered.
+                </p>
+                {% endif %}
             </div>
             {% endfor %}
-            {% else %}
-            <p style="font-size: 0.9rem; color: var(--success); margin: 0.5rem 0 0 0;">All attendees registered.</p>
-            {% endif %}
-        </div>
-        {% endfor %}
 
-        <button type="submit" class="btn">Save Attendees</button>
-    </form>
-
-    <p style="margin-top: 1.5rem;">
-        <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn btn-ghost" style="width: auto;">Back to
-            order</a>
-    </p>
+            <div class="flex flex-wrap gap-3 mt-8">
+                <button type="submit" class="btn-primary px-6 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Attendees
+                </button>
+                <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn-secondary px-6 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Order
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

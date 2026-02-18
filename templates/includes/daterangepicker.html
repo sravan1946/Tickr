@@ -1,6 +1,6 @@
 {% load static %}
 {% comment %}
-Re-usable Date Range Picker
+Date Range Picker - Styled to match form design
 
 Arguments:
 - start_field: The form field for start date
@@ -9,50 +9,38 @@ Arguments:
 - end_label: (Optional) Label for end date
 {% endcomment %}
 
-<div class="date-range-wrap" id="picker-{{ start_field.auto_id }}">
-
-    {# Start Date Column #}
-    <div class="date-col">
-        <label>{{ start_label|default:"Start date & time" }}</label>
-        <div class="cal" id="cal-start-{{ start_field.auto_id }}"></div>
-        <div class="time-row">
-            <input type="time" id="time-start-{{ start_field.auto_id }}" value="09:00">
-        </div>
-        <span class="fallback-toggle"
-            onclick="document.getElementById('fb-start-{{ start_field.auto_id }}').classList.toggle('show')">type
-            manually ▾</span>
-        <div class="native-fallback" id="fb-start-{{ start_field.auto_id }}">
-            {{ start_field }}
-            {{ start_field.errors }}
-        </div>
+<div class="space-y-6">
+    <div>
+        <label for="{{ start_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            {{ start_label|default:"Start Date & Time" }}
+        </label>
+        <input 
+            type="datetime-local" 
+            name="{{ start_field.name }}" 
+            id="{{ start_field.id_for_label }}"
+            class="input-field w-full px-4 py-3 rounded-xl"
+            value="{{ start_field.value|date:'Y-m-d\\TH:i'|default:'' }}"
+            {% if start_field.field.required %}required{% endif %}
+        >
+        {% if start_field.errors %}
+            <div class="mt-2 text-red-400 text-sm">{{ start_field.errors }}</div>
+        {% endif %}
     </div>
 
-    {# End Date Column #}
-    <div class="date-col">
-        <label>{{ end_label|default:"End date & time" }}</label>
-        <div class="cal" id="cal-end-{{ end_field.auto_id }}"></div>
-        <div class="time-row">
-            <input type="time" id="time-end-{{ end_field.auto_id }}" value="17:00">
-        </div>
-        <span class="fallback-toggle"
-            onclick="document.getElementById('fb-end-{{ end_field.auto_id }}').classList.toggle('show')">type manually
-            ▾</span>
-        <div class="native-fallback" id="fb-end-{{ end_field.auto_id }}">
-            {{ end_field }}
-            {{ end_field.errors }}
-        </div>
+    <div>
+        <label for="{{ end_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            {{ end_label|default:"End Date & Time" }}
+        </label>
+        <input 
+            type="datetime-local" 
+            name="{{ end_field.name }}" 
+            id="{{ end_field.id_for_label }}"
+            class="input-field w-full px-4 py-3 rounded-xl"
+            value="{{ end_field.value|date:'Y-m-d\\TH:i'|default:'' }}"
+            {% if end_field.field.required %}required{% endif %}
+        >
+        {% if end_field.errors %}
+            <div class="mt-2 text-red-400 text-sm">{{ end_field.errors }}</div>
+        {% endif %}
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        new DateRangePicker({
-            startInputId: '{{ start_field.auto_id }}',
-            endInputId: '{{ end_field.auto_id }}',
-            containerStartId: 'cal-start-{{ start_field.auto_id }}',
-            containerEndId: 'cal-end-{{ end_field.auto_id }}',
-            timeStartId: 'time-start-{{ start_field.auto_id }}',
-            timeEndId: 'time-end-{{ end_field.auto_id }}'
-        });
-    });
-</script>

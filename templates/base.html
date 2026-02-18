@@ -1,38 +1,657 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tickr{% endblock %} — Event Registration & Ticketing</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <nav>
-        <a href="{% url 'accounts:login' %}">Tickr</a>
-        <a href="{% url 'events:event_list' %}">Events</a>
-        {% block nav %}{% endblock %}
-        <span class="nav-right">
-            {% if account_user %}
-                <a href="{% url 'accounts:me' %}">Profile</a>
-                <a href="{% url 'accounts:logout' %}">Log out</a>
-            {% else %}
-                <a href="{% url 'accounts:login' %}">Log in</a>
-                <a href="{% url 'accounts:register' %}">Register</a>
-            {% endif %}
-        </span>
-    </nav>
-    <main class="container {% block main_class %}{% endblock %}">
-        {% if messages %}
-            <ul class="messages">
+<html lang="en" class="scroll-smooth">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Tickr{% endblock %} — Event Ticketing Platform</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Outfit', 'sans-serif'],
+                            display: ['Space Grotesk', 'sans-serif'],
+                        },
+                        colors: {
+                            dark: {
+                                900: '#0a0a0f',
+                                800: '#12121a',
+                                700: '#1a1a25',
+                                600: '#252535',
+                                500: '#353550',
+                            },
+                            neon: {
+                                cyan: '#00f5ff',
+                                purple: '#b829dd',
+                                pink: '#ff0080',
+                                lime: '#ccff00',
+                            }
+                        },
+                        animation: {
+                            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                            'float': 'float 6s ease-in-out infinite',
+                            'glow': 'glow 2s ease-in-out infinite alternate',
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0)' },
+                                '50%': { transform: 'translateY(-20px)' },
+                            },
+                            glow: {
+                                '0%': { boxShadow: '0 0 20px rgba(0, 245, 255, 0.3)' },
+                                '100%': { boxShadow: '0 0 40px rgba(0, 245, 255, 0.6), 0 0 60px rgba(184, 41, 221, 0.3)' },
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <style>
+            body {
+                background-color: #0a0a0f;
+                background-image:
+                    radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(184, 41, 221, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 128, 0.03) 0%, transparent 70%);
+            }
+
+            .glass {
+                background: rgba(26, 26, 37, 0.7);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .glass-card {
+                background: linear-gradient(135deg, rgba(26, 26, 37, 0.9) 0%, rgba(18, 18, 26, 0.9) 100%);
+                border: 1px solid rgba(255, 255, 255, 0.06);
+            }
+
+            .neon-border {
+                position: relative;
+            }
+
+            .neon-border::before {
+                content: '';
+                position: absolute;
+                inset: -1px;
+                background: linear-gradient(135deg, #00f5ff, #b829dd, #ff0080);
+                border-radius: inherit;
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .neon-border:hover::before {
+                opacity: 0.5;
+            }
+
+            .text-gradient {
+                background: linear-gradient(135deg, #00f5ff 0%, #b829dd 50%, #ff0080 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #00f5ff 0%, #00d4e0 100%);
+                color: #0a0a0f;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: white;
+                transition: all 0.3s ease;
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(0, 245, 255, 0.3);
+            }
+
+            .nav-link {
+                position: relative;
+                color: rgba(255, 255, 255, 0.6);
+                transition: color 0.3s ease;
+            }
+
+            .nav-link:hover {
+                color: white;
+            }
+
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: linear-gradient(90deg, #00f5ff, #b829dd);
+                transition: width 0.3s ease;
+            }
+
+            .nav-link:hover::after {
+                width: 100%;
+            }
+
+            .input-field {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: white;
+                transition: all 0.3s ease;
+            }
+
+            .input-field:focus {
+                outline: none;
+                border-color: #00f5ff;
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+            }
+
+            /* Custom Dropdown Styling */
+            select.input-field {
+                display: none;
+            }
+
+            .custom-dropdown {
+                position: relative;
+                width: 100%;
+            }
+
+            .custom-dropdown-trigger {
+                width: 100%;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 0.75rem;
+                padding: 0.75rem 2.5rem 0.75rem 1rem;
+                font-size: 1rem;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                transition: all 0.3s ease;
+                text-align: left;
+            }
+
+            .custom-dropdown-trigger:hover {
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+
+            .custom-dropdown-trigger:focus {
+                outline: none;
+                border-color: #00f5ff;
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+            }
+
+            .custom-dropdown-trigger.is-open {
+                border-color: #00f5ff;
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+            }
+
+            .custom-dropdown-arrow {
+                width: 1.25rem;
+                height: 1.25rem;
+                color: rgba(255, 255, 255, 0.5);
+                transition: transform 0.3s ease;
+                flex-shrink: 0;
+            }
+
+            .custom-dropdown-trigger.is-open .custom-dropdown-arrow {
+                transform: rotate(180deg);
+            }
+
+            .custom-dropdown-menu {
+                position: absolute;
+                top: calc(100% + 0.5rem);
+                left: 0;
+                right: 0;
+                background: #1a1a2e;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 0.75rem;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                max-height: 300px;
+                overflow-y: auto;
+                z-index: 100;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.2s ease;
+            }
+
+            .custom-dropdown-menu.is-open {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .custom-dropdown-option {
+                padding: 0.75rem 1rem;
+                color: white;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .custom-dropdown-option:last-child {
+                border-bottom: none;
+            }
+
+            .custom-dropdown-option:hover,
+            .custom-dropdown-option.is-highlighted {
+                background: rgba(0, 245, 255, 0.15);
+                color: #00f5ff;
+            }
+
+            .custom-dropdown-option.is-selected {
+                background: rgba(0, 245, 255, 0.2);
+                color: #00f5ff;
+            }
+
+            .message {
+                animation: slideIn 0.4s ease-out;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+                {
+                % block extra_css %
+            }
+
+                {
+                % endblock %
+            }
+        </style>
+    </head>
+
+    <body class="text-gray-200 min-h-screen flex flex-col font-sans">
+        <!-- Navigation -->
+        <nav class="glass fixed top-0 left-0 right-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
+                    <a href="{% url 'home' %}" class="flex items-center gap-2 group">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                            <span class="text-dark-900 font-bold text-lg">T</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-white">Tickr</span>
+                    </a>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
+                        <a href="{% url 'category_list' %}" class="nav-link text-sm font-medium">Categories</a>
+                        <a href="{% url 'venue_list' %}" class="nav-link text-sm font-medium">Venues</a>
+                        {% block nav %}{% endblock %}
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="flex items-center gap-4">
+                        {% if account_user %}
+                        <div class="relative group">
+                            <button
+                                class="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-semibold text-xs">
+                                    {{ account_user.username|first|upper }}
+                                </div>
+                                <span class="hidden sm:block">{{ account_user.username }}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div
+                                class="absolute right-0 top-full mt-2 w-48 glass-card rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                                <div class="py-2">
+                                    <a href="{% url 'accounts:me' %}"
+                                        class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
+                                    {% if not account_user.is_organizer %}
+                                    <a href="{% url 'my_orders' %}"
+                                        class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">My
+                                        Tickets</a>
+                                    {% endif %}
+                                    {% if account_user.is_organizer %}
+                                    <div class="border-t border-white/10 my-1"></div>
+                                    <a href="{% url 'organizer_profile' %}"
+                                        class="block px-4 py-2 text-sm text-neon-cyan hover:bg-white/5 transition-colors">Organizer
+                                        Profile</a>
+                                    {% endif %}
+                                    <div class="border-t border-white/10 my-1"></div>
+                                    <a href="{% url 'accounts:logout' %}"
+                                        class="block px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors">Log
+                                        Out</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'accounts:login' %}"
+                            class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Log In</a>
+                        <a href="{% url 'accounts:register' %}" class="btn-primary px-4 py-2 rounded-lg text-sm">Get
+                            Started</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow pt-16">
+            <!-- Messages -->
+            {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                 {% for message in messages %}
-                    <li class="{{ message.tags }}">{{ message }}</li>
+                <div
+                    class="message rounded-xl p-4 mb-4 flex items-center gap-3 {% if message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% elif message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% elif message.tags == 'warning' %}bg-yellow-500/10 border border-yellow-500/20 text-yellow-400{% else %}bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan{% endif %}">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if message.tags == 'success' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        {% elif message.tags == 'error' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                        {% elif message.tags == 'warning' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        {% endif %}
+                    </svg>
+                    <span class="text-sm font-medium">{{ message }}</span>
+                </div>
                 {% endfor %}
-            </ul>
-        {% endif %}
-        {% block content %}{% endblock %}
-    </main>
-    {% block extra_js %}{% endblock %}
-</body>
+            </div>
+            {% endif %}
+
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-white/5 mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="col-span-1 md:col-span-2">
+                        <a href="{% url 'home' %}" class="flex items-center gap-2 mb-4">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center">
+                                <span class="text-dark-900 font-bold text-lg">T</span>
+                            </div>
+                            <span class="font-display font-bold text-xl text-white">Tickr</span>
+                        </a>
+                        <p class="text-gray-400 text-sm max-w-sm">The modern platform for event ticketing and
+                            management. Create, manage, and attend events seamlessly.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Platform</h4>
+                        <ul class="space-y-2">
+                            <li><a href="{% url 'events:event_list' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Browse Events</a>
+                            </li>
+                            <li><a href="{% url 'category_list' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Categories</a></li>
+                            <li><a href="{% url 'venue_list' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Venues</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Account</h4>
+                        <ul class="space-y-2">
+                            {% if account_user %}
+                            <li><a href="{% url 'accounts:me' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Dashboard</a></li>
+                            {% if not account_user.is_organizer %}
+                            <li><a href="{% url 'my_orders' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">My Tickets</a></li>
+                            {% endif %}
+                            {% else %}
+                            <li><a href="{% url 'accounts:login' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Log In</a></li>
+                            <li><a href="{% url 'accounts:register' %}"
+                                    class="text-sm text-gray-400 hover:text-white transition-colors">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-white/5 mt-12 pt-8 text-center">
+                    <p class="text-sm text-gray-500">© {% now "Y" %} Tickr. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        {% block extra_js %}{% endblock %}
+
+        <script>
+            // Custom Dropdown Library
+            class CustomDropdown {
+                constructor(selectElement) {
+                    this.select = selectElement;
+                    this.container = null;
+                    this.trigger = null;
+                    this.menu = null;
+                    this.options = [];
+                    this.isOpen = false;
+                    this.highlightedIndex = -1;
+
+                    this.init();
+                }
+
+                init() {
+                    this.createDropdown();
+                    this.bindEvents();
+                    this.select.style.display = 'none';
+                }
+
+                createDropdown() {
+                    // Create container
+                    this.container = document.createElement('div');
+                    this.container.className = 'custom-dropdown';
+
+                    // Create trigger
+                    this.trigger = document.createElement('button');
+                    this.trigger.className = 'custom-dropdown-trigger';
+                    this.trigger.type = 'button';
+                    this.trigger.setAttribute('aria-haspopup', 'listbox');
+                    this.trigger.setAttribute('aria-expanded', 'false');
+
+                    // Get selected option text
+                    const selectedOption = this.select.options[this.select.selectedIndex];
+                    this.trigger.innerHTML = `
+                        <span class="custom-dropdown-text">${selectedOption ? selectedOption.text : 'Select...'}</span>
+                        <svg class="custom-dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    `;
+
+                    // Create menu
+                    this.menu = document.createElement('div');
+                    this.menu.className = 'custom-dropdown-menu';
+                    this.menu.setAttribute('role', 'listbox');
+
+                    // Create options
+                    Array.from(this.select.options).forEach((option, index) => {
+                        const optionEl = document.createElement('div');
+                        optionEl.className = 'custom-dropdown-option';
+                        optionEl.textContent = option.text;
+                        optionEl.setAttribute('role', 'option');
+                        optionEl.setAttribute('data-value', option.value);
+                        optionEl.setAttribute('data-index', index);
+
+                        if (option.selected) {
+                            optionEl.classList.add('is-selected');
+                            optionEl.setAttribute('aria-selected', 'true');
+                        }
+
+                        this.menu.appendChild(optionEl);
+                        this.options.push(optionEl);
+                    });
+
+                    // Assemble
+                    this.container.appendChild(this.trigger);
+                    this.container.appendChild(this.menu);
+                    this.select.parentNode.insertBefore(this.container, this.select.nextSibling);
+                }
+
+                bindEvents() {
+                    // Toggle on click
+                    this.trigger.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.toggle();
+                    });
+
+                    // Option selection
+                    this.options.forEach((option, index) => {
+                        option.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.selectOption(index);
+                        });
+
+                        option.addEventListener('mouseenter', () => {
+                            this.highlightOption(index);
+                        });
+                    });
+
+                    // Keyboard navigation
+                    this.trigger.addEventListener('keydown', (e) => {
+                        switch (e.key) {
+                            case 'Enter':
+                            case ' ':
+                                e.preventDefault();
+                                this.toggle();
+                                break;
+                            case 'ArrowDown':
+                                e.preventDefault();
+                                if (!this.isOpen) this.open();
+                                this.highlightNext();
+                                break;
+                            case 'ArrowUp':
+                                e.preventDefault();
+                                if (!this.isOpen) this.open();
+                                this.highlightPrev();
+                                break;
+                            case 'Escape':
+                                this.close();
+                                break;
+                        }
+                    });
+
+                    // Close on click outside
+                    document.addEventListener('click', (e) => {
+                        if (!this.container.contains(e.target)) {
+                            this.close();
+                        }
+                    });
+
+                    // Close on select change from elsewhere
+                    this.select.addEventListener('change', () => {
+                        this.updateSelected();
+                    });
+                }
+
+                toggle() {
+                    this.isOpen ? this.close() : this.open();
+                }
+
+                open() {
+                    this.isOpen = true;
+                    this.trigger.classList.add('is-open');
+                    this.menu.classList.add('is-open');
+                    this.trigger.setAttribute('aria-expanded', 'true');
+
+                    // Scroll to selected option
+                    const selectedIndex = this.select.selectedIndex;
+                    if (selectedIndex >= 0) {
+                        this.highlightOption(selectedIndex);
+                    }
+                }
+
+                close() {
+                    this.isOpen = false;
+                    this.trigger.classList.remove('is-open');
+                    this.menu.classList.remove('is-open');
+                    this.trigger.setAttribute('aria-expanded', 'false');
+                    this.highlightedIndex = -1;
+                    this.options.forEach(opt => opt.classList.remove('is-highlighted'));
+                }
+
+                highlightOption(index) {
+                    this.options.forEach(opt => opt.classList.remove('is-highlighted'));
+                    if (index >= 0 && index < this.options.length) {
+                        this.options[index].classList.add('is-highlighted');
+                        this.highlightedIndex = index;
+                        this.options[index].scrollIntoView({ block: 'nearest' });
+                    }
+                }
+
+                highlightNext() {
+                    let nextIndex = this.highlightedIndex + 1;
+                    if (nextIndex >= this.options.length) nextIndex = 0;
+                    this.highlightOption(nextIndex);
+                }
+
+                highlightPrev() {
+                    let prevIndex = this.highlightedIndex - 1;
+                    if (prevIndex < 0) prevIndex = this.options.length - 1;
+                    this.highlightOption(prevIndex);
+                }
+
+                selectOption(index) {
+                    this.select.selectedIndex = index;
+                    this.select.dispatchEvent(new Event('change', { bubbles: true }));
+                    this.updateSelected();
+                    this.close();
+                    this.trigger.focus();
+                }
+
+                updateSelected() {
+                    const selectedOption = this.select.options[this.select.selectedIndex];
+                    const textSpan = this.trigger.querySelector('.custom-dropdown-text');
+                    if (textSpan && selectedOption) {
+                        textSpan.textContent = selectedOption.text;
+                    }
+
+                    this.options.forEach((opt, idx) => {
+                        opt.classList.toggle('is-selected', idx === this.select.selectedIndex);
+                        opt.setAttribute('aria-selected', idx === this.select.selectedIndex ? 'true' : 'false');
+                    });
+                }
+            }
+
+            // Initialize custom dropdowns on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select.input-field');
+                selects.forEach(select => new CustomDropdown(select));
+            });
+        </script>
+    </body>
+
 </html>

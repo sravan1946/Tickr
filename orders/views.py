@@ -36,6 +36,11 @@ class OrderCreateView(View):
 
     @method_decorator(login_required)
     def get(self, request: HttpRequest) -> HttpResponse:
+        user = _get_user_or_redirect(request)
+        if user and user.is_organizer:
+            messages.error(request, "Organizer accounts cannot purchase tickets. Please use a regular account.")
+            return redirect("events:event_list")
+
         event_id = request.GET.get("event")
         if not event_id:
             messages.error(request, "Please select an event first.")
@@ -58,13 +63,17 @@ class OrderCreateView(View):
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest) -> HttpResponse:
+        user = _get_user_or_redirect(request)
+        if user and user.is_organizer:
+            messages.error(request, "Organizer accounts cannot purchase tickets. Please use a regular account.")
+            return redirect("events:event_list")
+
         event_id = request.POST.get("event_id")
         if not event_id:
             messages.error(request, "Missing event.")
             return redirect("events:event_list")
 
         event = get_object_or_404(Event, pk=event_id, is_published=True, is_cancelled=False)
-        user = _get_user_or_redirect(request)
 
         # Parse all ticket-type / quantity pairs from the POST body.
         # Each row sends ticket_type_id + quantity with a prefix like row-<n>-
@@ -154,14 +163,25 @@ class OrderDetailView(View):
             return redirect("my_orders")
 
         items = order.items.select_related("ticket_type").all()
-        # Prefetch attendees for each item
+        # Prefetch attendees for each item and track completeness
+        all_attendees_added = True
+        total_attendees_needed = 0
+        total_attendees_added = 0
         for item in items:
             item.attendee_list = item.attendees.select_related("ticket").all()
+            item.attendees_needed = item.quantity - item.attendee_list.count()
+            total_attendees_needed += item.quantity
+            total_attendees_added += item.attendee_list.count()
+            if item.attendees_needed > 0:
+                all_attendees_added = False
 
         return render(request, "orders/order_detail.html", {
             "order": order,
             "items": items,
             "event": order.event,
+            "all_attendees_added": all_attendees_added,
+            "total_attendees_needed": total_attendees_needed,
+            "total_attendees_added": total_attendees_added,
         })
 
 
@@ -184,6 +204,16 @@ class OrderConfirmView(View):
         if order.status != "pending":
             messages.warning(request, f"Order is already {order.status}.")
             return redirect("orders:order_detail", pk=order.pk)
+
+        # Ensure all attendees have been added before confirming
+        for item in order.items.all():
+            attendee_count = item.attendees.count()
+            if attendee_count < item.quantity:
+                messages.error(
+                    request,
+                    "Please add all attendee details before confirming your order.",
+                )
+                return redirect("orders:order_detail", pk=order.pk)
 
         with transaction.atomic():
             # Issue tickets for each item

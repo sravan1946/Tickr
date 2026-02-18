@@ -3,23 +3,45 @@
 {% block title %}Delete Ticket Type — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_list' %}">Events</a>
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
-<a href="{% url 'events:event_tickets' pk=event.pk %}">Ticket Types</a>
+<a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
+<a href="{% url 'events:event_tickets' pk=event.pk %}" class="nav-link text-sm font-medium">Ticket Types</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">Delete Ticket Type</h1>
-    <p>Are you sure you want to delete <strong>{{ ticket_type.name }}</strong>? This cannot be undone.</p>
-    <p style="color: var(--text-muted); font-size: 0.9rem;">
-        This will delete the ticket type and all associated tickets.
-    </p>
-    <form method="post" action="">
-        {% csrf_token %}
-        <button type="submit" class="btn" style="background: var(--error);">Delete</button>
-        <a href="{% url 'events:event_tickets' pk=event.pk %}" class="btn btn-ghost"
-            style="width: auto; margin-left: 0.5rem;">Cancel</a>
-    </form>
+<div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="glass-card rounded-2xl p-8 border-red-500/20">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-display text-2xl font-bold text-white">Delete Ticket Type</h1>
+                <p class="text-gray-400 text-sm">This action cannot be undone</p>
+            </div>
+        </div>
+
+        <div class="bg-red-500/5 border border-red-500/10 rounded-xl p-4 mb-6">
+            <p class="text-gray-300 mb-2">
+                Are you sure you want to delete <span class="text-white font-semibold">{{ ticket_type.name }}</span>?
+            </p>
+            <p class="text-gray-400 text-sm">
+                This will delete the ticket type and all associated tickets.
+            </p>
+        </div>
+
+        <form method="post" action="" class="flex flex-col sm:flex-row gap-4">
+            {% csrf_token %}
+            <button type="submit" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Delete
+            </button>
+            <a href="{% url 'events:event_tickets' pk=event.pk %}" class="flex-1 btn-secondary py-3 rounded-xl font-semibold text-center">Cancel</a>
+        </form>
+    </div>
 </div>
 {% endblock %}

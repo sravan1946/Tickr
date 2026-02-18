@@ -1,54 +1,56 @@
 {% extends "base.html" %}
 
 {% block title %}Check-in Result — {{ event.title }}{% endblock %}
-{% block main_class %}container-wide{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
-<a href="{% url 'checkin:checkin_scan' pk=event.pk %}">Scan</a>
-<a href="{% url 'checkin:checkin_list' pk=event.pk %}">View Check-ins</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
+<a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="nav-link text-sm font-medium">Scan</a>
+<a href="{% url 'checkin:checkin_list' pk=event.pk %}" class="nav-link text-sm font-medium">View Check-ins</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    {% if success %}
-    <div
-        style="border: 2px solid var(--success); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
-        <p style="font-size: 2rem; margin: 0;">✅</p>
-        <h2 style="color: var(--success); margin: 0.5rem 0 0 0;">Checked In!</h2>
-        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">{{ checkin.checked_in_at|date:"M j, Y g:i A" }}</p>
-    </div>
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        {% if success %}
+        <div class="border-2 border-green-500 rounded-xl p-6 mb-6 text-center bg-green-500/5">
+            <div class="text-5xl mb-2">✅</div>
+            <h2 class="text-2xl font-display font-bold text-green-400 mb-2">Checked In!</h2>
+            <p class="text-gray-400">{{ checkin.checked_in_at|date:"M j, Y g:i A" }}</p>
+        </div>
 
-    <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
-        <p style="margin: 0.5rem 0;"><strong>Ticket Code:</strong> <code>{{ ticket.code }}</code></p>
-        <p style="margin: 0.5rem 0;"><strong>Ticket Type:</strong> {{ ticket.ticket_type.name }}</p>
-        {% if attendee %}
-        <p style="margin: 0.5rem 0;"><strong>Attendee:</strong> {{ attendee.full_name }} ({{ attendee.email }})</p>
+        <div class="border-t border-white/10 pt-6 space-y-2">
+            <p class="text-gray-300"><strong class="text-white">Ticket Code:</strong> <code class="bg-dark-700 px-2 py-1 rounded text-neon-cyan text-sm">{{ ticket.code }}</code></p>
+            <p class="text-gray-300"><strong class="text-white">Ticket Type:</strong> {{ ticket.ticket_type.name }}</p>
+            {% if attendee %}
+            <p class="text-gray-300"><strong class="text-white">Attendee:</strong> {{ attendee.full_name }} ({{ attendee.email }})</p>
+            {% endif %}
+        </div>
+
+        {% else %}
+        <div class="border-2 border-red-500 rounded-xl p-6 mb-6 text-center bg-red-500/5">
+            <div class="text-5xl mb-2">❌</div>
+            <h2 class="text-2xl font-display font-bold text-red-400 mb-2">Check-in Failed</h2>
+            <p class="text-gray-400">{{ error }}</p>
+        </div>
         {% endif %}
+
+        <h3 class="text-xl font-display font-semibold text-white mt-8 mb-4">Scan Another Ticket</h3>
+        <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_code" class="block text-sm font-medium text-gray-300 mb-2">Ticket Code</label>
+                <input type="text" name="code" id="id_code" class="input-field w-full px-4 py-3 rounded-xl" placeholder="Enter ticket code" required>
+                {% if form.code.errors %}
+                <p class="mt-2 text-red-400 text-sm">{{ form.code.errors }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold">Check In</button>
+        </form>
     </div>
 
-    {% else %}
-    <div
-        style="border: 2px solid var(--error); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
-        <p style="font-size: 2rem; margin: 0;">❌</p>
-        <h2 style="color: var(--error); margin: 0.5rem 0 0 0;">Check-in Failed</h2>
-        <p style="color: var(--text-muted); margin: 0.5rem 0 0 0;">{{ error }}</p>
+    <div class="flex flex-wrap gap-3 mt-6 justify-center">
+        <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to scan</a>
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to event</a>
     </div>
-    {% endif %}
-
-    <h3 style="margin-top: 1.5rem;">Scan Another Ticket</h3>
-    <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
-        {% csrf_token %}
-        <label for="id_code">Ticket Code</label>
-        {{ form.code }}
-        {{ form.code.errors }}
-        <button type="submit" class="btn" style="margin-top: 0.5rem;">Check In</button>
-    </form>
 </div>
-
-<p>
-    <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Back to scan</a>
-    <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost"
-        style="width: auto; margin-left: 0.5rem;">Back to event</a>
-</p>
 {% endblock %}

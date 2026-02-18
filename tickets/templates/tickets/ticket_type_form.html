@@ -4,9 +4,9 @@
 {% block title %}Edit Ticket Type — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_list' %}">Events</a>
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
-<a href="{% url 'events:event_tickets' pk=event.pk %}">Ticket Types</a>
+<a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
+<a href="{% url 'events:event_tickets' pk=event.pk %}" class="nav-link text-sm font-medium">Ticket Types</a>
 {% endblock %}
 
 {% block extra_css %}
@@ -14,33 +14,50 @@
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">Edit Ticket Type</h1>
-    <form method="post" action="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}">
-        {% csrf_token %}
-        {% for field in form %}
-        {% if field.name == "sale_start" %}
-        {# ── calendar date-range picker ────── #}
-        {% with end_field=form.sale_end %}
-        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field start_label="Sale Start" end_label="Sale End" %}
-        {% endwith %}
-        {% elif field.name == "sale_end" %}
-        {# Skip, handled with sale_start #}
-        {% else %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {{ field.errors }}
-        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
-        {% endif %}
-        {% endfor %}
-        <button type="submit" class="btn">Update ticket type</button>
-    </form>
-    <p style="margin-top: 1rem;">
-        <a href="{% url 'events:event_tickets' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
-    </p>
-</div>
-{% endblock %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        <h1 class="text-3xl font-display font-bold text-white mb-6">Edit Ticket Type</h1>
 
-{% block extra_js %}
-<script src="{% static 'js/calendar.js' %}"></script>
+        <form method="post" action="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+            {% if field.name == "sale_start" %}
+            {% with end_field=form.sale_end %}
+            {% include "includes/daterangepicker.html" with start_field=field end_field=end_field start_label="Sale Start" end_label="Sale End" %}
+            {% endwith %}
+            {% elif field.name == "sale_end" %}
+            {# Skip, handled with sale_start #}
+            {% elif field.name == "is_active" %}
+            <label class="form-checkbox-wrapper">
+                <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
+                <span class="form-checkbox-switch"></span>
+                <span class="form-checkbox-label">{{ field.label }}</span>
+            </label>
+            {% if field.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ field.errors }}</p>
+            {% endif %}
+            {% else %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                <input type="{% if 'price' in field.name or 'quantity' in field.name %}number{% else %}text{% endif %}"
+                    name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
+                    class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                {% if field.errors %}
+                <p class="mt-2 text-red-400 text-sm">{{ field.errors }}</p>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <div class="flex flex-wrap gap-3 pt-4">
+                <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-semibold">Update Ticket Type</button>
+                <a href="{% url 'events:event_tickets' pk=event.pk %}"
+                    class="btn-secondary px-6 py-3 rounded-lg font-semibold">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

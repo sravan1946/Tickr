@@ -1,42 +1,47 @@
 {% extends "base.html" %}
 
 {% block title %}Check-in — {{ event.title }}{% endblock %}
-{% block main_class %}container-wide{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
-<a href="{% url 'checkin:checkin_list' pk=event.pk %}">View Check-ins</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
+<a href="{% url 'checkin:checkin_list' pk=event.pk %}" class="nav-link text-sm font-medium">View Check-ins</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">Check-in</h1>
-    <p style="color: var(--text-muted);">Event: {{ event.title }}</p>
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        <h1 class="text-3xl font-display font-bold text-white mb-2">Check-in</h1>
+        <p class="text-gray-400 mb-6">Event: {{ event.title }}</p>
 
-    {% if total_tickets is not None %}
-    <div style="display: flex; gap: 1.5rem; margin: 1rem 0 1.5rem 0;">
-        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
-            <p style="font-size: 2rem; font-weight: 700; margin: 0; color: var(--accent);">{{ checked_in_count }}</p>
-            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Checked In</p>
+        {% if total_tickets is not None %}
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-dark-800/50 border border-white/10 rounded-xl p-4 text-center">
+                <p class="text-3xl font-bold text-neon-cyan">{{ checked_in_count }}</p>
+                <p class="text-gray-400 text-sm mt-1">Checked In</p>
+            </div>
+            <div class="bg-dark-800/50 border border-white/10 rounded-xl p-4 text-center">
+                <p class="text-3xl font-bold text-white">{{ total_tickets }}</p>
+                <p class="text-gray-400 text-sm mt-1">Total Booked</p>
+            </div>
         </div>
-        <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; flex: 1; text-align: center;">
-            <p style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_tickets }}</p>
-            <p style="margin: 0.25rem 0 0 0; color: var(--text-muted); font-size: 0.85rem;">Total Booked</p>
-        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_code" class="block text-sm font-medium text-gray-300 mb-2">Ticket Code</label>
+                <input type="text" name="code" id="id_code" class="input-field w-full px-4 py-3 rounded-xl" placeholder="Enter ticket code" required>
+                {% if form.code.errors %}
+                <p class="mt-2 text-red-400 text-sm">{{ form.code.errors }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold">Check In</button>
+        </form>
     </div>
-    {% endif %}
 
-    <form method="post" action="{% url 'checkin:checkin_scan' pk=event.pk %}">
-        {% csrf_token %}
-        <label for="id_code">Ticket Code</label>
-        {{ form.code }}
-        {{ form.code.errors }}
-        <button type="submit" class="btn" style="margin-top: 0.5rem;">Check In</button>
-    </form>
+    <div class="flex flex-wrap gap-3 mt-6 justify-center">
+        <a href="{% url 'checkin:checkin_list' pk=event.pk %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">View all check-ins</a>
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to event</a>
+    </div>
 </div>
-
-<p>
-    <a href="{% url 'checkin:checkin_list' pk=event.pk %}" class="btn btn-ghost" style="width: auto;">View all check-ins</a>
-    <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto; margin-left: 0.5rem;">Back to event</a>
-</p>
 {% endblock %}

@@ -1,27 +1,54 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Log In{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top:0;">Log in</h1>
-    <p class="text-muted" style="color: var(--text-muted); margin-bottom: 1.5rem;">Sign in to your Tickr account.</p>
-    <form method="post" action="{% url 'accounts:login' %}">
-        {% csrf_token %}
-        {% if next %}
-        <input type="hidden" name="next" value="{{ next }}">
-        {% endif %}
-        {% for field in form %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {{ field.errors }}
-        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
-        {% endfor %}
-        <button type="submit" class="btn">Log in</button>
-    </form>
-    <p style="margin-top: 1rem; text-align: center;">
-        Don't have an account? <a
-            href="{% url 'accounts:register' %}{% if next %}?next={{ next }}{% endif %}">Register</a>
-    </p>
+<div class="min-h-[80vh] flex items-center justify-center py-12">
+    <div class="w-full max-w-md px-4">
+        <div class="glass-card rounded-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center mx-auto mb-4">
+                    <span class="text-dark-900 font-display text-2xl font-bold">T</span>
+                </div>
+                <h1 class="font-display text-2xl font-bold text-white mb-2">Welcome back</h1>
+                <p class="text-gray-400">Sign in to your Tickr account</p>
+            </div>
+            
+            <form method="post" action="{% url 'accounts:login' %}" class="space-y-6">
+                {% csrf_token %}
+                {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+                
+                {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                    <input type="{% if field.name == 'password' %}password{% else %}email{% endif %}" 
+                        name="{{ field.name }}" 
+                        id="{{ field.id_for_label }}"
+                        class="input-field w-full px-4 py-3 rounded-xl"
+                        placeholder="{% if field.name == 'password' %}Enter your password{% else %}Enter your email{% endif %}"
+                        required>
+                    {% if field.errors %}
+                        <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-8 text-center">
+                <p class="text-gray-400">
+                    Don't have an account? 
+                    <a href="{% url 'accounts:register' %}{% if next %}?next={{ next }}{% endif %}" class="text-neon-cyan hover:underline font-medium">
+                        Create one
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,45 +1,113 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if event %}Edit{% else %}Create{% endif %} event{% endblock %}
-
-{% block nav %}
-<a href="{% url 'events:event_list' %}">Events</a>
-{% endblock %}
+{% block title %}{% if event %}Edit{% else %}Create{% endif %} Event{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/calendar.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">{% if event %}Edit event{% else %}Create event{% endif %}</h1>
-    <form method="post" action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_list' %}{% endif %}">
-        {% csrf_token %}
-        {% for field in form %}
-        {% if field.name == "start_date" %}
-        {# ── calendar date-range picker ────── #}
-        {# We skip end_date in the loop because it's handled here #}
-        {% with end_field=form.end_date %}
-        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field %}
-        {% endwith %}
-        {% elif field.name == "end_date" %}
-        {# Skip, handled with start_date #}
-        {% else %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {{ field.errors }}
-        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
-        {% endif %}
-        {% endfor %}
-        <button type="submit" class="btn">{% if event %}Update{% else %}Create{% endif %} event</button>
-    </form>
-    <p style="margin-top: 1rem;">
-        <a href="{% url 'events:event_list' %}" class="btn btn-ghost" style="width: auto;">Cancel</a>
-    </p>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="glass-card rounded-2xl p-8">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center">
+                <svg class="w-6 h-6 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {% if event %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    {% else %}
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    {% endif %}
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-display text-2xl sm:text-3xl font-bold text-white">
+                    {% if event %}Edit Event{% else %}Create New Event{% endif %}
+                </h1>
+                <p class="text-gray-400 text-sm">
+                    {% if event %}Update your event details{% else %}Fill in the details to create your event{% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <form method="post" action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_create' %}{% endif %}" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                {% if field.name == "start_date" %}
+                    {% with end_field=form.end_date %}
+                        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field %}
+                    {% endwith %}
+                {% elif field.name == "end_date" %}
+                    {# Skip, handled with start_date #}
+                {% elif field.name == "description" %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                        <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="5" 
+                            class="input-field w-full px-4 py-3 rounded-xl resize-none"
+                            {% if field.value %}placeholder="{{ field.value }}"{% endif %}>{{ field.value|default:'' }}</textarea>
+                        {% if field.errors %}
+                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% elif field.name == "category" or field.name == "venue" %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                            {% for choice in field.field.choices %}
+                                <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if field.errors %}
+                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% elif field.field.widget.input_type == "checkbox" %}
+                    <label class="form-checkbox-wrapper">
+                        <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
+                        <span class="form-checkbox-switch"></span>
+                        <span class="form-checkbox-label">{{ field.label }}</span>
+                    </label>
+                    {% if field.errors %}
+                        <div class="text-red-400 text-sm mt-2">{{ field.errors }}</div>
+                    {% endif %}
+                {% else %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                            name="{{ field.name }}" 
+                            id="{{ field.id_for_label }}"
+                            value="{{ field.value|default:'' }}"
+                            class="input-field w-full px-4 py-3 rounded-xl"
+                            {% if field.field.required %}required{% endif %}>
+                        {% if field.errors %}
+                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" class="btn-primary flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {% if event %}Update Event{% else %}Create Event{% endif %}
+                </button>
+                <a href="{% url 'events:event_list' %}" class="btn-secondary py-4 px-8 rounded-xl font-semibold text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

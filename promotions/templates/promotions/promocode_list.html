@@ -3,58 +3,57 @@
 {% block title %}Promo Codes — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-        <h1 style="margin-top: 0;">Promo Codes</h1>
-        <a href="{% url 'promotions:promocode_create' %}?event={{ event.pk }}" class="btn" style="width: auto;">+ New
-            Promo Code</a>
-    </div>
-    <p style="color: var(--text-muted);">Event: {{ event.title }}</p>
-
-    {% if promo_codes %}
-    <div style="margin: 1.5rem 0;">
-        {% for promo in promo_codes %}
-        <div
-            style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass-card rounded-2xl p-6 md:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h3 style="margin: 0 0 0.25rem 0;">
-                    <code>{{ promo.code }}</code>
-                    {% if not promo.is_valid %}
-                    <span style="color: var(--error); font-size: 0.8rem; font-weight: normal;">(inactive)</span>
-                    {% endif %}
-                </h3>
-                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
-                    {% if promo.discount_type == "percentage" %}
-                    {{ promo.discount_value }}% off
-                    {% else %}
-                    ${{ promo.discount_value }} off
-                    {% endif %}
-                    &middot; Used {{ promo.used_count }}{% if promo.usage_limit %}/{{ promo.usage_limit }}{% endif %}
-                    {% if promo.expires_at %}
-                    &middot; Expires {{ promo.expires_at|date:"M j, Y g:i A" }}
-                    {% endif %}
-                </p>
+                <h1 class="text-3xl font-display font-bold text-white">Promo Codes</h1>
+                <p class="text-gray-400 mt-1">Event: {{ event.title }}</p>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
-                <a href="{% url 'promotions:promocode_update' pk=promo.pk %}" class="btn btn-ghost"
-                    style="width: auto;">Edit</a>
-                <a href="{% url 'promotions:promocode_delete' pk=promo.pk %}" class="btn btn-ghost"
-                    style="width: auto; color: var(--error);">Delete</a>
-            </div>
+            <a href="{% url 'promotions:promocode_create' %}?event={{ event.pk }}" class="btn-primary px-4 py-2 rounded-lg text-sm">+ New Promo Code</a>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p style="color: var(--text-muted); margin-top: 1rem;">No promo codes yet. Create one to get started.</p>
-    {% endif %}
 
-    <p style="margin-top: 1.5rem;">
-        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
-            event</a>
-    </p>
+        {% if promo_codes %}
+        <div class="space-y-3">
+            {% for promo in promo_codes %}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-white/10 rounded-xl bg-dark-800/30 gap-4">
+                <div>
+                    <h3 class="text-white font-semibold mb-1">
+                        <code class="bg-dark-700 px-2 py-1 rounded text-neon-cyan text-sm">{{ promo.code }}</code>
+                        {% if not promo.is_valid %}
+                        <span class="text-red-400 text-sm font-normal">(inactive)</span>
+                        {% endif %}
+                    </h3>
+                    <p class="text-gray-400 text-sm">
+                        {% if promo.discount_type == "percentage" %}
+                        {{ promo.discount_value }}% off
+                        {% else %}
+                        ${{ promo.discount_value }} off
+                        {% endif %}
+                        · Used {{ promo.used_count }}{% if promo.usage_limit %}/{{ promo.usage_limit }}{% endif %}
+                        {% if promo.expires_at %}
+                        · Expires {{ promo.expires_at|date:"M j, Y g:i A" }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'promotions:promocode_update' pk=promo.pk %}" class="btn-secondary px-3 py-1.5 rounded-lg text-sm">Edit</a>
+                    <a href="{% url 'promotions:promocode_delete' pk=promo.pk %}" class="bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm transition-colors">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-400 text-center py-8">No promo codes yet. Create one to get started.</p>
+        {% endif %}
+
+        <div class="mt-8">
+            <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to event</a>
+        </div>
+    </div>
 </div>
 {% endblock %}
