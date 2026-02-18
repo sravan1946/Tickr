@@ -4,9 +4,11 @@
 {% block title %}Edit Ticket Type — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
-<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
-<a href="{% url 'events:event_tickets' pk=event.pk %}" class="nav-link text-sm font-medium">Ticket Types</a>
+<a href="{% url 'events:event_list' %}" class="nav-link">Events</a>
+<span class="text-gray-600">|</span>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link">{{ event.title|truncatechars:20 }}</a>
+<span class="text-gray-600">|</span>
+<a href="{% url 'events:event_tickets' pk=event.pk %}" class="nav-link">Ticket Types</a>
 {% endblock %}
 
 {% block extra_css %}
@@ -15,8 +17,8 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="glass-card rounded-2xl p-6 md:p-8">
-        <h1 class="text-3xl font-display font-bold text-white mb-6">Edit Ticket Type</h1>
+    <div class="brutal-card border-technical p-6 md:p-8">
+        <h1 class="text-3xl font-mono font-bold text-white mb-6 tracking-wider">EDIT_TICKET_TYPE</h1>
 
         <form method="post" action="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="space-y-4">
             {% csrf_token %}
@@ -34,28 +36,28 @@
                 <span class="form-checkbox-label">{{ field.label }}</span>
             </label>
             {% if field.errors %}
-            <p class="text-red-400 text-sm mt-2">{{ field.errors }}</p>
+            <p class="text-brutal-red text-sm mt-2 font-mono">[ERROR] {{ field.errors }}</p>
             {% endif %}
             {% else %}
             <div>
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                 <input type="{% if 'price' in field.name or 'quantity' in field.name %}number{% else %}text{% endif %}"
                     name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
-                    class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                    class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
                 {% if field.errors %}
-                <p class="mt-2 text-red-400 text-sm">{{ field.errors }}</p>
+                <p class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</p>
                 {% endif %}
                 {% if field.help_text %}
-                <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                 {% endif %}
             </div>
             {% endif %}
             {% endfor %}
 
             <div class="flex flex-wrap gap-3 pt-4">
-                <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-semibold">Update Ticket Type</button>
+                <button type="submit" class="brutal-btn">UPDATE_</button>
                 <a href="{% url 'events:event_tickets' pk=event.pk %}"
-                    class="btn-secondary px-6 py-3 rounded-lg font-semibold">Cancel</a>
+                    class="brutal-btn-outline px-6 py-3">CANCEL_</a>
             </div>
         </form>
     </div>

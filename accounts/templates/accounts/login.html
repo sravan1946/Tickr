@@ -5,13 +5,13 @@
 {% block content %}
 <div class="min-h-[80vh] flex items-center justify-center py-12">
     <div class="w-full max-w-md px-4">
-        <div class="glass-card rounded-2xl p-8">
+        <div class="brutal-card border-technical p-8">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center mx-auto mb-4">
-                    <span class="text-dark-900 font-display text-2xl font-bold">T</span>
+                <div class="w-16 h-16 bg-brutal-cyan flex items-center justify-center mx-auto mb-4 border-2 border-brutal-cyan">
+                    <span class="text-white font-mono text-2xl font-bold">T</span>
                 </div>
-                <h1 class="font-display text-2xl font-bold text-white mb-2">Welcome back</h1>
-                <p class="text-gray-400">Sign in to your Tickr account</p>
+                <h1 class="font-mono text-2xl font-bold text-white mb-2 tracking-wider">AUTHENTICATION</h1>
+                <p class="text-gray-400 font-mono text-sm">// Sign in to access system</p>
             </div>
             
             <form method="post" action="{% url 'accounts:login' %}" class="space-y-6">
@@ -22,29 +22,29 @@
                 
                 {% for field in form %}
                 <div>
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                     <input type="{% if field.name == 'password' %}password{% else %}email{% endif %}" 
                         name="{{ field.name }}" 
                         id="{{ field.id_for_label }}"
-                        class="input-field w-full px-4 py-3 rounded-xl"
+                        class="brutal-input w-full"
                         placeholder="{% if field.name == 'password' %}Enter your password{% else %}Enter your email{% endif %}"
                         required>
                     {% if field.errors %}
-                        <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                        <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                     {% endif %}
                 </div>
                 {% endfor %}
                 
-                <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold">
-                    Sign In
+                <button type="submit" class="brutal-btn w-full">
+                    AUTHENTICATE_
                 </button>
             </form>
             
             <div class="mt-8 text-center">
-                <p class="text-gray-400">
-                    Don't have an account? 
-                    <a href="{% url 'accounts:register' %}{% if next %}?next={{ next }}{% endif %}" class="text-neon-cyan hover:underline font-medium">
-                        Create one
+                <p class="text-gray-400 font-mono text-sm">
+                    No account? 
+                    <a href="{% url 'accounts:register' %}{% if next %}?next={{ next }}{% endif %}" class="text-brutal-cyan hover:underline font-bold">
+                        [REGISTER]
                     </a>
                 </p>
             </div>

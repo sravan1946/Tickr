@@ -3,62 +3,67 @@
 {% block title %}Check-ins — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
-<a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="nav-link text-sm font-medium">Scan</a>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link">{{ event.title|truncatechars:20 }}</a>
+<span class="text-gray-600">|</span>
+<a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="nav-link">Scan</a>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="glass-card rounded-2xl p-6 md:p-8">
+    <div class="mb-8">
+        <span class="font-mono text-sm text-gray-500 tracking-widest block mb-2">// CHECKIN_LOG</span>
+        <h1 class="font-mono text-3xl font-bold text-white tracking-tighter">CHECK-INS — {{ event.title|upper }}</h1>
+    </div>
+
+    <div class="brutal-card border-technical p-6 md:p-8">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h1 class="text-3xl font-display font-bold text-white">Check-ins</h1>
-                <p class="text-gray-400 mt-1">Event: {{ event.title }}</p>
+                <p class="text-gray-400 mt-1 font-mono">Event: {{ event.title }}</p>
             </div>
-            <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="btn-primary px-4 py-2 rounded-lg text-sm">Scan Ticket</a>
+            <a href="{% url 'checkin:checkin_scan' pk=event.pk %}" class="brutal-btn text-sm">SCAN_TICKET_</a>
         </div>
 
         <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="bg-dark-800/50 border border-white/10 rounded-xl p-4 text-center">
-                <p class="text-3xl font-bold text-neon-cyan">{{ checked_in_count }}</p>
-                <p class="text-gray-400 text-sm mt-1">Checked In</p>
+            <div class="border-2 border-brutal-lightgray bg-brutal-dark p-4 text-center">
+                <p class="text-3xl font-bold text-brutal-green font-mono">{{ checked_in_count }}</p>
+                <p class="text-gray-400 text-sm mt-1 font-mono">CHECKED_IN</p>
             </div>
-            <div class="bg-dark-800/50 border border-white/10 rounded-xl p-4 text-center">
-                <p class="text-3xl font-bold text-white">{{ total_tickets }}</p>
-                <p class="text-gray-400 text-sm mt-1">Total Booked</p>
+            <div class="border-2 border-brutal-lightgray bg-brutal-dark p-4 text-center">
+                <p class="text-3xl font-bold text-white font-mono">{{ total_tickets }}</p>
+                <p class="text-gray-400 text-sm mt-1 font-mono">TOTAL_BOOKED</p>
             </div>
-            <div class="bg-dark-800/50 border border-white/10 rounded-xl p-4 text-center">
-                <p class="text-3xl font-bold text-green-400">
+            <div class="border-2 border-brutal-lightgray bg-brutal-dark p-4 text-center">
+                <p class="text-3xl font-bold text-green-500 font-mono">
                     {% if total_tickets %}{% widthratio checked_in_count total_tickets 100 %}%{% else %}0%{% endif %}
                 </p>
-                <p class="text-gray-400 text-sm mt-1">Complete</p>
+                <p class="text-gray-400 text-sm mt-1 font-mono">COMPLETE</p>
             </div>
         </div>
 
         {% if checkins %}
         <div class="space-y-3">
             {% for ci in checkins %}
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-white/10 rounded-xl bg-dark-800/30 gap-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border-2 border-brutal-lightgray bg-brutal-dark gap-4">
                 <div>
-                    <h3 class="text-white font-semibold mb-1">
-                        <code class="bg-dark-700 px-2 py-1 rounded text-neon-cyan text-sm">{{ ci.ticket.code }}</code>
+                    <h3 class="text-white font-mono font-bold mb-1">
+                        <code class="bg-brutal-gray px-2 py-1 text-brutal-cyan text-sm">{{ ci.ticket.code }}</code>
                         <span class="text-gray-400 text-sm font-normal">· {{ ci.ticket.ticket_type.name }}</span>
                     </h3>
-                    <p class="text-gray-400 text-sm">
-                        Checked in at {{ ci.checked_in_at|date:"M j, Y g:i A" }}
-                        · by {{ ci.checked_in_by.username }}
+                    <p class="text-gray-400 text-sm font-mono">
+                        {{ ci.checked_in_at|date:"Y-m-d H:i" }}
+                        · BY {{ ci.checked_in_by.username|upper }}
                     </p>
                 </div>
-                <a href="{% url 'tickets:ticket_detail' code=ci.ticket.code %}" class="btn-secondary px-3 py-1.5 rounded-lg text-sm">View Ticket</a>
+                <a href="{% url 'tickets:ticket_detail' code=ci.ticket.code %}" class="brutal-btn-outline px-3 py-1.5 text-sm">VIEW_TICKET_</a>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-gray-400 text-center py-8">No check-ins recorded yet. Start scanning tickets!</p>
+        <p class="text-gray-400 text-center py-8 font-mono">No check-ins recorded yet. Start scanning tickets!</p>
         {% endif %}
 
         <div class="mt-8">
-            <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to event</a>
+            <a href="{% url 'events:event_detail' slug=event.slug %}" class="brutal-btn-outline px-4 py-2 text-sm">BACK_TO_EVENT_</a>
         </div>
     </div>
 </div>

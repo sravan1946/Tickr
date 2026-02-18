@@ -3,68 +3,66 @@
 {% block title %}Ticket {{ ticket.code }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_list' %}">Events</a>
-<a href="{% url 'events:event_detail' slug=event.slug %}">{{ event.title }}</a>
+<a href="{% url 'events:event_list' %}" class="nav-link">Events</a>
+<span class="text-gray-600">|</span>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link">{{ event.title|truncatechars:20 }}</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1 style="margin-top: 0;">Ticket Details</h1>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <span class="font-mono text-sm text-gray-500 tracking-widest block mb-2">// TICKET_DETAILS</span>
+        <h1 class="font-mono text-3xl font-bold text-white tracking-tighter">TICKET_INFO</h1>
+    </div>
 
-    <div style="border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
-        <div style="text-align: center; margin-bottom: 1rem;">
-            <h2 style="margin: 0; font-size: 1.5rem; letter-spacing: 0.1em;">{{ ticket.code }}</h2>
-            <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">Ticket Code</p>
+    <div class="brutal-card border-technical p-8">
+        <div class="text-center mb-8 p-6 border-2 border-brutal-cyan bg-brutal-gray">
+            <h2 class="font-mono text-4xl font-bold text-white tracking-widest mb-2">{{ ticket.code }}</h2>
+            <p class="font-mono text-sm text-gray-400">TICKET_CODE</p>
         </div>
 
-        <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
-            <p style="margin: 0.5rem 0;">
-                <strong>Event:</strong> {{ event.title }}
+        <div class="border-t-2 border-brutal-lightgray pt-6 mt-6 space-y-4 font-mono">
+            <p class="flex justify-between">
+                <span class="text-gray-400">EVENT:</span>
+                <span class="text-white font-bold">{{ event.title }}</span>
             </p>
-            <p style="margin: 0.5rem 0;">
-                <strong>Ticket Type:</strong> {{ ticket_type.name }}
+            <p class="flex justify-between">
+                <span class="text-gray-400">TYPE:</span>
+                <span class="text-white font-bold">{{ ticket_type.name }}</span>
             </p>
-            <p style="margin: 0.5rem 0;">
-                <strong>Price:</strong> ${{ ticket_type.price }}
+            <p class="flex justify-between">
+                <span class="text-gray-400">PRICE:</span>
+                <span class="text-white font-bold">${{ ticket_type.price }}</span>
             </p>
-            <p style="margin: 0.5rem 0;">
-                <strong>Status:</strong>
-                <span style="text-transform: capitalize;">
-                    {% if ticket.status == "available" %}
-                    <span style="color: var(--success);">Available</span>
-                    {% elif ticket.status == "booked" %}
-                    <span style="color: var(--accent);">Booked</span>
-                    {% elif ticket.status == "cancelled" %}
-                    <span style="color: var(--error);">Cancelled</span>
-                    {% else %}
-                    {{ ticket.status }}
-                    {% endif %}
+            <p class="flex justify-between">
+                <span class="text-gray-400">STATUS:</span>
+                <span class="{% if ticket.status == 'available' %}text-green-500{% elif ticket.status == 'booked' %}text-brutal-red{% elif ticket.status == 'cancelled' %}text-gray-500{% endif %} font-bold">
+                    {% if ticket.status == "available" %}[AVAILABLE]{% elif ticket.status == "booked" %}[BOOKED]{% elif ticket.status == "cancelled" %}[CANCELLED]{% else %}[{{ ticket.status|upper }}]{% endif %}
                 </span>
             </p>
-            <p style="margin: 0.5rem 0;">
-                <strong>Created:</strong> {{ ticket.created_at|date:"M j, Y g:i A" }}
+            <p class="flex justify-between">
+                <span class="text-gray-400">CREATED:</span>
+                <span class="text-white">{{ ticket.created_at|date:"Y-m-d H:i" }}</span>
             </p>
-            <p style="margin: 0.5rem 0;">
-                <strong>Check-in:</strong>
+            <p class="flex justify-between">
+                <span class="text-gray-400">CHECK-IN:</span>
                 {% if ticket.checkin %}
-                <span style="color: var(--success);">✅ Checked in at {{ ticket.checkin.checked_in_at|date:"M j, Y g:i A"
-                    }}</span>
+                <span class="text-green-500 font-bold">[CHECKED_IN] {{ ticket.checkin.checked_in_at|date:"Y-m-d H:i" }}</span>
                 {% else %}
-                <span style="color: var(--text-muted);">Not checked in</span>
+                <span class="text-gray-500">[NOT_CHECKED_IN]</span>
                 {% endif %}
             </p>
         </div>
+
+        {% if is_owner %}
+        <p class="mt-6 text-gray-400 text-sm font-mono">
+            <span class="text-brutal-cyan">></span> You are the organizer of this event.
+        </p>
+        {% endif %}
+
+        <p class="mt-8">
+            <a href="{% url 'events:event_detail' slug=event.slug %}" class="brutal-btn-outline">BACK_TO_EVENT_</a>
+        </p>
     </div>
-
-    {% if is_owner %}
-    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
-        You are the organizer of this event.
-    </p>
-    {% endif %}
-
-    <p style="margin-top: 1.5rem;">
-        <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-ghost" style="width: auto;">Back to
-            event</a>
-    </p>
 </div>
 {% endblock %}

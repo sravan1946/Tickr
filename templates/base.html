@@ -9,47 +9,44 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-            rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
         <script>
             tailwind.config = {
-                darkMode: 'class',
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Outfit', 'sans-serif'],
-                            display: ['Space Grotesk', 'sans-serif'],
+                            sans: ['Inter', 'sans-serif'],
+                            mono: ['Space Mono', 'monospace'],
                         },
                         colors: {
-                            dark: {
-                                900: '#0a0a0f',
-                                800: '#12121a',
-                                700: '#1a1a25',
-                                600: '#252535',
-                                500: '#353550',
-                            },
-                            neon: {
-                                cyan: '#00f5ff',
-                                purple: '#b829dd',
-                                pink: '#ff0080',
-                                lime: '#ccff00',
+                            brutal: {
+                                black: '#000000',
+                                dark: '#0a0a0a',
+                                gray: '#1a1a1a',
+                                lightgray: '#2a2a2a',
+                                white: '#ffffff',
+                                red: '#dc2626',
+                                redlight: '#ef4444',
+                                green: '#39ff14',
+                                greenlight: '#5cff47',
+                                cyan: '#00d9ff',
+                                cyanlight: '#4de8ff',
                             }
                         },
                         animation: {
-                            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                            'float': 'float 6s ease-in-out infinite',
-                            'glow': 'glow 2s ease-in-out infinite alternate',
+                            'glitch': 'glitch 1s linear infinite',
+                            'scan': 'scan 8s linear infinite',
                         },
                         keyframes: {
-                            float: {
-                                '0%, 100%': { transform: 'translateY(0)' },
-                                '50%': { transform: 'translateY(-20px)' },
+                            glitch: {
+                                '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
+                                '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
+                                '62%': { transform: 'translate(0,0) skew(5deg)' },
                             },
-                            glow: {
-                                '0%': { boxShadow: '0 0 20px rgba(0, 245, 255, 0.3)' },
-                                '100%': { boxShadow: '0 0 40px rgba(0, 245, 255, 0.6), 0 0 60px rgba(184, 41, 221, 0.3)' },
+                            scan: {
+                                '0%': { backgroundPosition: '0% 0%' },
+                                '100%': { backgroundPosition: '0% 100%' },
                             }
                         }
                     }
@@ -57,116 +54,167 @@
             }
         </script>
         <style>
+            * {
+                box-sizing: border-box;
+            }
+
             body {
-                background-color: #0a0a0f;
-                background-image:
-                    radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse at 80% 80%, rgba(184, 41, 221, 0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 128, 0.03) 0%, transparent 70%);
+                background-color: #000000;
+                color: #ffffff;
+                font-family: 'Inter', sans-serif;
+                line-height: 1.6;
             }
 
-            .glass {
-                background: rgba(26, 26, 37, 0.7);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.08);
+            /* Grid overlay effect */
+            .grid-overlay {
+                background-image: 
+                    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                background-size: 50px 50px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: 0;
             }
 
-            .glass-card {
-                background: linear-gradient(135deg, rgba(26, 26, 37, 0.9) 0%, rgba(18, 18, 26, 0.9) 100%);
-                border: 1px solid rgba(255, 255, 255, 0.06);
+            /* Scan line effect */
+            .scan-lines {
+                background: linear-gradient(
+                    to bottom,
+                    rgba(255,255,255,0),
+                    rgba(255,255,255,0) 50%,
+                    rgba(0,0,0,0.2) 50%,
+                    rgba(0,0,0,0.2)
+                );
+                background-size: 100% 4px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0.15;
             }
 
-            .neon-border {
-                position: relative;
+            /* Brutalist cards - NO BORDER RADIUS */
+            .brutal-card {
+                background: #0a0a0a;
+                border: 2px solid #2a2a2a;
+                transition: all 0.2s ease;
             }
 
-            .neon-border::before {
-                content: '';
-                position: absolute;
-                inset: -1px;
-                background: linear-gradient(135deg, #00f5ff, #b829dd, #ff0080);
-                border-radius: inherit;
-                z-index: -1;
-                opacity: 0;
-                transition: opacity 0.3s ease;
+            .brutal-card:hover {
+                border-color: #dc2626;
             }
 
-            .neon-border:hover::before {
-                opacity: 0.5;
+            /* Primary button - aggressive red */
+            .brutal-btn {
+                background: #dc2626;
+                color: #ffffff;
+                border: 2px solid #dc2626;
+                padding: 1rem 2rem;
+                font-family: 'Space Mono', monospace;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                clip-path: polygon(0 0, 100% 0, 100% 75%, 95% 100%, 0 100%);
             }
 
-            .text-gradient {
-                background: linear-gradient(135deg, #00f5ff 0%, #b829dd 50%, #ff0080 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+            .brutal-btn:hover {
+                background: #ef4444;
+                border-color: #ef4444;
+                transform: translate(-2px, -2px);
+                box-shadow: 4px 4px 0 #000, 4px 4px 0 2px #dc2626;
             }
 
-            .btn-primary {
-                background: linear-gradient(135deg, #00f5ff 0%, #00d4e0 100%);
-                color: #0a0a0f;
-                font-weight: 600;
-                transition: all 0.3s ease;
+            .brutal-btn:active {
+                transform: translate(0, 0);
+                box-shadow: none;
             }
 
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+            /* Secondary button - outline */
+            .brutal-btn-outline {
+                background: transparent;
+                color: #ffffff;
+                border: 2px solid #ffffff;
+                padding: 1rem 2rem;
+                font-family: 'Space Mono', monospace;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                cursor: pointer;
+                transition: all 0.15s ease;
             }
 
-            .btn-secondary {
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                color: white;
-                transition: all 0.3s ease;
+            .brutal-btn-outline:hover {
+                background: #ffffff;
+                color: #000000;
             }
 
-            .btn-secondary:hover {
-                background: rgba(255, 255, 255, 0.1);
-                border-color: rgba(0, 245, 255, 0.3);
-            }
-
+            /* Navigation */
             .nav-link {
-                position: relative;
-                color: rgba(255, 255, 255, 0.6);
-                transition: color 0.3s ease;
+                font-family: 'Space Mono', monospace;
+                font-weight: 700;
+                color: #ffffff;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 0.5rem 1rem;
+                border-bottom: 2px solid transparent;
+                transition: all 0.2s ease;
             }
 
             .nav-link:hover {
-                color: white;
+                border-bottom-color: #dc2626;
+                color: #dc2626;
             }
 
-            .nav-link::after {
-                content: '';
-                position: absolute;
-                bottom: -4px;
-                left: 0;
-                width: 0;
-                height: 2px;
-                background: linear-gradient(90deg, #00f5ff, #b829dd);
-                transition: width 0.3s ease;
-            }
-
-            .nav-link:hover::after {
+            /* Input fields */
+            .brutal-input {
+                background: #0a0a0a;
+                border: 2px solid #2a2a2a;
+                padding: 1rem;
+                color: #ffffff;
+                font-family: 'Space Mono', monospace;
                 width: 100%;
+                transition: all 0.2s ease;
             }
 
-            .input-field {
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                color: white;
-                transition: all 0.3s ease;
-            }
-
-            .input-field:focus {
+            .brutal-input:focus {
                 outline: none;
-                border-color: #00f5ff;
-                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+                border-color: #dc2626;
+                background: #1a1a1a;
+            }
+
+            .brutal-input::placeholder {
+                color: #666;
+            }
+
+            /* Typography */
+            .font-mono {
+                font-family: 'Space Mono', monospace;
+            }
+
+            /* Accent text */
+            .text-red-accent {
+                color: #dc2626;
+            }
+
+            .bg-red-accent {
+                background-color: #dc2626;
+            }
+
+            .border-red-accent {
+                border-color: #dc2626;
             }
 
             /* Custom Dropdown Styling */
-            select.input-field {
+            select.brutal-input {
                 display: none;
             }
 
@@ -177,39 +225,31 @@
 
             .custom-dropdown-trigger {
                 width: 100%;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 0.75rem;
-                padding: 0.75rem 2.5rem 0.75rem 1rem;
-                font-size: 1rem;
-                color: white;
+                background: #0a0a0a;
+                border: 2px solid #2a2a2a;
+                padding: 1rem 3rem 1rem 1rem;
+                color: #ffffff;
+                font-family: 'Space Mono', monospace;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                transition: all 0.3s ease;
+                transition: all 0.2s ease;
                 text-align: left;
             }
 
             .custom-dropdown-trigger:hover {
-                border-color: rgba(255, 255, 255, 0.2);
-            }
-
-            .custom-dropdown-trigger:focus {
-                outline: none;
-                border-color: #00f5ff;
-                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+                border-color: #3a3a3a;
             }
 
             .custom-dropdown-trigger.is-open {
-                border-color: #00f5ff;
-                box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+                border-color: #dc2626;
             }
 
             .custom-dropdown-arrow {
                 width: 1.25rem;
                 height: 1.25rem;
-                color: rgba(255, 255, 255, 0.5);
+                color: #ffffff;
                 transition: transform 0.3s ease;
                 flex-shrink: 0;
             }
@@ -220,13 +260,11 @@
 
             .custom-dropdown-menu {
                 position: absolute;
-                top: calc(100% + 0.5rem);
+                top: calc(100% + 2px);
                 left: 0;
                 right: 0;
-                background: #1a1a2e;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 0.75rem;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                background: #0a0a0a;
+                border: 2px solid #2a2a2a;
                 max-height: 300px;
                 overflow-y: auto;
                 z-index: 100;
@@ -243,11 +281,12 @@
             }
 
             .custom-dropdown-option {
-                padding: 0.75rem 1rem;
-                color: white;
+                padding: 1rem;
+                font-family: 'Space Mono', monospace;
+                color: #ffffff;
                 cursor: pointer;
-                transition: all 0.2s ease;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                transition: all 0.15s ease;
+                border-bottom: 1px solid #1a1a1a;
             }
 
             .custom-dropdown-option:last-child {
@@ -256,60 +295,174 @@
 
             .custom-dropdown-option:hover,
             .custom-dropdown-option.is-highlighted {
-                background: rgba(0, 245, 255, 0.15);
-                color: #00f5ff;
+                background: #1a1a1a;
+                color: #dc2626;
             }
 
             .custom-dropdown-option.is-selected {
-                background: rgba(0, 245, 255, 0.2);
-                color: #00f5ff;
+                background: #dc2626;
+                color: #ffffff;
             }
 
+            /* Messages */
             .message {
-                animation: slideIn 0.4s ease-out;
+                animation: slideIn 0.3s ease-out;
+                border-left: 4px solid;
+                padding: 1rem 1.5rem;
+                margin-bottom: 1rem;
+                font-family: 'Space Mono', monospace;
             }
 
             @keyframes slideIn {
                 from {
                     opacity: 0;
-                    transform: translateY(-10px);
+                    transform: translateX(-20px);
                 }
-
                 to {
                     opacity: 1;
-                    transform: translateY(0);
+                    transform: translateX(0);
                 }
             }
 
-                {
-                % block extra_css %
+            .message-success {
+                background: #0a1f0a;
+                border-left-color: #22c55e;
+                color: #22c55e;
             }
 
-                {
-                % endblock %
+            .message-error {
+                background: #1f0a0a;
+                border-left-color: #dc2626;
+                color: #dc2626;
             }
+
+            .message-warning {
+                background: #1f1a0a;
+                border-left-color: #f59e0b;
+                color: #f59e0b;
+            }
+
+            .message-info {
+                background: #0a0a1f;
+                border-left-color: #3b82f6;
+                color: #3b82f6;
+            }
+
+            /* Hazard stripes pattern */
+            .hazard-stripes {
+                background: repeating-linear-gradient(
+                    45deg,
+                    #dc2626,
+                    #dc2626 10px,
+                    #000 10px,
+                    #000 20px
+                );
+            }
+
+            /* Technical borders */
+            .border-technical {
+                border: 1px solid #2a2a2a;
+                position: relative;
+            }
+
+            .border-technical::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: -1px;
+                width: 10px;
+                height: 10px;
+                border-top: 2px solid #dc2626;
+                border-left: 2px solid #dc2626;
+            }
+
+            .border-technical::after {
+                content: '';
+                position: absolute;
+                bottom: -1px;
+                right: -1px;
+                width: 10px;
+                height: 10px;
+                border-bottom: 2px solid #dc2626;
+                border-right: 2px solid #dc2626;
+            }
+
+            /* Glitch effect on hover */
+            .glitch-hover:hover {
+                animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+                color: #dc2626;
+            }
+
+            /* Data display */
+            .data-label {
+                font-family: 'Space Mono', monospace;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: #666;
+            }
+
+            .data-value {
+                font-family: 'Space Mono', monospace;
+                font-weight: 700;
+                font-size: 1.5rem;
+            }
+
+            /* Section dividers */
+            .section-divider {
+                height: 2px;
+                background: #2a2a2a;
+                position: relative;
+            }
+
+            .section-divider::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: -3px;
+                width: 40px;
+                height: 8px;
+                background: #dc2626;
+            }
+
+            /* Footer accent */
+            .footer-accent {
+                border-top: 4px solid #dc2626;
+            }
+
+            {% block extra_css %}{% endblock %}
         </style>
     </head>
 
-    <body class="text-gray-200 min-h-screen flex flex-col font-sans">
+    <body class="min-h-screen flex flex-col relative">
+        <!-- Grid overlay -->
+        <div class="grid-overlay"></div>
+        
+        <!-- Scan lines -->
+        <div class="scan-lines"></div>
+
         <!-- Navigation -->
-        <nav class="glass fixed top-0 left-0 right-0 z-50">
+        <nav class="border-b-2 border-brutal-lightgray sticky top-0 z-50 bg-brutal-black">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
+                <div class="flex items-center justify-between h-20">
                     <!-- Logo -->
-                    <a href="{% url 'home' %}" class="flex items-center gap-2 group">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                            <span class="text-dark-900 font-bold text-lg">T</span>
+                    <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 bg-brutal-red flex items-center justify-center border-2 border-brutal-red group-hover:bg-brutal-white group-hover:border-brutal-white transition-all">
+                            <span class="font-mono font-bold text-xl text-white group-hover:text-brutal-black">T</span>
                         </div>
-                        <span class="font-display font-bold text-xl text-white">Tickr</span>
+                        <div>
+                            <span class="font-mono font-bold text-2xl tracking-wider">TICKR</span>
+                            <span class="block text-xs text-gray-500 font-mono tracking-widest">EVENT SYSTEM_v2.0</span>
+                        </div>
                     </a>
 
                     <!-- Desktop Navigation -->
-                    <div class="hidden md:flex items-center gap-8">
-                        <a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
-                        <a href="{% url 'category_list' %}" class="nav-link text-sm font-medium">Categories</a>
-                        <a href="{% url 'venue_list' %}" class="nav-link text-sm font-medium">Venues</a>
+                    <div class="hidden md:flex items-center gap-1">
+                        <a href="{% url 'events:event_list' %}" class="nav-link">Events</a>
+                        <span class="text-gray-600 mx-2">|</span>
+                        <a href="{% url 'category_list' %}" class="nav-link">Categories</a>
+                        <span class="text-gray-600 mx-2">|</span>
+                        <a href="{% url 'venue_list' %}" class="nav-link">Venues</a>
                         {% block nav %}{% endblock %}
                     </div>
 
@@ -317,46 +470,36 @@
                     <div class="flex items-center gap-4">
                         {% if account_user %}
                         <div class="relative group">
-                            <button
-                                class="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-semibold text-xs">
+                            <button class="flex items-center gap-3 border-2 border-brutal-lightgray px-4 py-2 hover:border-brutal-red transition-colors">
+                                <div class="w-8 h-8 bg-brutal-gray border border-brutal-lightgray flex items-center justify-center font-mono font-bold text-sm">
                                     {{ account_user.username|first|upper }}
                                 </div>
-                                <span class="hidden sm:block">{{ account_user.username }}</span>
+                                <span class="hidden sm:block font-mono text-sm tracking-wider">{{ account_user.username }}</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div
-                                class="absolute right-0 top-full mt-2 w-48 glass-card rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
-                                <div class="py-2">
-                                    <a href="{% url 'accounts:me' %}"
-                                        class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
+                            <div class="absolute right-0 top-full mt-2 w-64 brutal-card opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="border-b border-brutal-lightgray p-3 bg-brutal-gray">
+                                    <span class="text-xs font-mono text-gray-500">USER_MENU</span>
+                                </div>
+                                <div class="p-2">
+                                    <a href="{% url 'accounts:me' %}" class="block px-4 py-3 font-mono text-sm hover:bg-brutal-gray hover:text-brutal-red transition-colors">[01] Dashboard</a>
                                     {% if not account_user.is_organizer %}
-                                    <a href="{% url 'my_orders' %}"
-                                        class="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">My
-                                        Tickets</a>
+                                    <a href="{% url 'my_orders' %}" class="block px-4 py-3 font-mono text-sm hover:bg-brutal-gray hover:text-brutal-red transition-colors">[02] My Tickets</a>
                                     {% endif %}
                                     {% if account_user.is_organizer %}
-                                    <div class="border-t border-white/10 my-1"></div>
-                                    <a href="{% url 'organizer_profile' %}"
-                                        class="block px-4 py-2 text-sm text-neon-cyan hover:bg-white/5 transition-colors">Organizer
-                                        Profile</a>
+                                    <div class="h-px bg-brutal-lightgray my-1"></div>
+                                    <a href="{% url 'organizer_profile' %}" class="block px-4 py-3 font-mono text-sm text-brutal-red hover:bg-brutal-gray transition-colors">[ORG] Profile</a>
                                     {% endif %}
-                                    <div class="border-t border-white/10 my-1"></div>
-                                    <a href="{% url 'accounts:logout' %}"
-                                        class="block px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors">Log
-                                        Out</a>
+                                    <div class="h-px bg-brutal-lightgray my-1"></div>
+                                    <a href="{% url 'accounts:logout' %}" class="block px-4 py-3 font-mono text-sm text-gray-500 hover:text-brutal-red hover:bg-brutal-gray transition-colors">[X] Log Out</a>
                                 </div>
                             </div>
                         </div>
                         {% else %}
-                        <a href="{% url 'accounts:login' %}"
-                            class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Log In</a>
-                        <a href="{% url 'accounts:register' %}" class="btn-primary px-4 py-2 rounded-lg text-sm">Get
-                            Started</a>
+                        <a href="{% url 'accounts:login' %}" class="nav-link">Log In</a>
+                        <a href="{% url 'accounts:register' %}" class="brutal-btn text-sm">Register</a>
                         {% endif %}
                     </div>
                 </div>
@@ -364,28 +507,14 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="flex-grow pt-16">
+        <main class="flex-grow relative z-10">
             <!-- Messages -->
             {% if messages %}
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 {% for message in messages %}
-                <div
-                    class="message rounded-xl p-4 mb-4 flex items-center gap-3 {% if message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% elif message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% elif message.tags == 'warning' %}bg-yellow-500/10 border border-yellow-500/20 text-yellow-400{% else %}bg-neon-cyan/10 border border-neon-cyan/20 text-neon-cyan{% endif %}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {% if message.tags == 'success' %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        {% elif message.tags == 'error' %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                        {% elif message.tags == 'warning' %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        {% else %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        {% endif %}
-                    </svg>
-                    <span class="text-sm font-medium">{{ message }}</span>
+                <div class="message {% if message.tags == 'success' %}message-success{% elif message.tags == 'error' %}message-error{% elif message.tags == 'warning' %}message-warning{% else %}message-info{% endif %}">
+                    <span class="text-sm">{% if message.tags == 'success' %}[OK]{% elif message.tags == 'error' %}[ERR]{% elif message.tags == 'warning' %}[WARN]{% else %}[INFO]{% endif %}</span>
+                    <span class="ml-2">{{ message }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -396,53 +525,55 @@
         </main>
 
         <!-- Footer -->
-        <footer class="border-t border-white/5 mt-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <footer class="mt-20 bg-brutal-dark footer-accent relative z-10">
+            <div class="hazard-stripes h-2"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div class="col-span-1 md:col-span-2">
-                        <a href="{% url 'home' %}" class="flex items-center gap-2 mb-4">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center">
-                                <span class="text-dark-900 font-bold text-lg">T</span>
+                        <a href="{% url 'home' %}" class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-brutal-red flex items-center justify-center border-2 border-brutal-red">
+                                <span class="font-mono font-bold text-xl text-white">T</span>
                             </div>
-                            <span class="font-display font-bold text-xl text-white">Tickr</span>
+                            <div>
+                                <span class="font-mono font-bold text-2xl tracking-wider">TICKR</span>
+                                <span class="block text-xs text-gray-500 font-mono">EST. 2024</span>
+                            </div>
                         </a>
-                        <p class="text-gray-400 text-sm max-w-sm">The modern platform for event ticketing and
-                            management. Create, manage, and attend events seamlessly.</p>
+                        <p class="text-gray-400 text-sm max-w-sm font-mono leading-relaxed">
+                            Raw event ticketing infrastructure. No fluff. Pure functionality.
+                        </p>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-white mb-4">Platform</h4>
+                        <h4 class="font-mono font-bold text-sm mb-4 tracking-widest text-gray-500">// PLATFORM</h4>
                         <ul class="space-y-2">
-                            <li><a href="{% url 'events:event_list' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Browse Events</a>
-                            </li>
-                            <li><a href="{% url 'category_list' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Categories</a></li>
-                            <li><a href="{% url 'venue_list' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Venues</a></li>
+                            <li><a href="{% url 'events:event_list' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Events</a></li>
+                            <li><a href="{% url 'category_list' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Categories</a></li>
+                            <li><a href="{% url 'venue_list' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Venues</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-white mb-4">Account</h4>
+                        <h4 class="font-mono font-bold text-sm mb-4 tracking-widest text-gray-500">// ACCOUNT</h4>
                         <ul class="space-y-2">
                             {% if account_user %}
-                            <li><a href="{% url 'accounts:me' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Dashboard</a></li>
+                            <li><a href="{% url 'accounts:me' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Dashboard</a></li>
                             {% if not account_user.is_organizer %}
-                            <li><a href="{% url 'my_orders' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">My Tickets</a></li>
+                            <li><a href="{% url 'my_orders' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> My Tickets</a></li>
                             {% endif %}
                             {% else %}
-                            <li><a href="{% url 'accounts:login' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Log In</a></li>
-                            <li><a href="{% url 'accounts:register' %}"
-                                    class="text-sm text-gray-400 hover:text-white transition-colors">Register</a></li>
+                            <li><a href="{% url 'accounts:login' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Log In</a></li>
+                            <li><a href="{% url 'accounts:register' %}" class="text-sm text-gray-300 hover:text-brutal-red transition-colors font-mono">> Register</a></li>
                             {% endif %}
                         </ul>
                     </div>
                 </div>
-                <div class="border-t border-white/5 mt-12 pt-8 text-center">
-                    <p class="text-sm text-gray-500">© {% now "Y" %} Tickr. All rights reserved.</p>
+                <div class="mt-12 pt-8 border-t border-brutal-lightgray">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p class="font-mono text-xs text-gray-600">© {% now "Y" %} TICKR_SYSTEMS // ALL RIGHTS RESERVED</p>
+                        <div class="flex gap-4">
+                            <span class="font-mono text-xs text-gray-600">SYS_STATUS: ONLINE</span>
+                            <span class="font-mono text-xs text-gray-600">VER: 2.0.1</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
@@ -471,18 +602,15 @@
                 }
 
                 createDropdown() {
-                    // Create container
                     this.container = document.createElement('div');
                     this.container.className = 'custom-dropdown';
 
-                    // Create trigger
                     this.trigger = document.createElement('button');
                     this.trigger.className = 'custom-dropdown-trigger';
                     this.trigger.type = 'button';
                     this.trigger.setAttribute('aria-haspopup', 'listbox');
                     this.trigger.setAttribute('aria-expanded', 'false');
 
-                    // Get selected option text
                     const selectedOption = this.select.options[this.select.selectedIndex];
                     this.trigger.innerHTML = `
                         <span class="custom-dropdown-text">${selectedOption ? selectedOption.text : 'Select...'}</span>
@@ -491,12 +619,10 @@
                         </svg>
                     `;
 
-                    // Create menu
                     this.menu = document.createElement('div');
                     this.menu.className = 'custom-dropdown-menu';
                     this.menu.setAttribute('role', 'listbox');
 
-                    // Create options
                     Array.from(this.select.options).forEach((option, index) => {
                         const optionEl = document.createElement('div');
                         optionEl.className = 'custom-dropdown-option';
@@ -514,21 +640,18 @@
                         this.options.push(optionEl);
                     });
 
-                    // Assemble
                     this.container.appendChild(this.trigger);
                     this.container.appendChild(this.menu);
                     this.select.parentNode.insertBefore(this.container, this.select.nextSibling);
                 }
 
                 bindEvents() {
-                    // Toggle on click
                     this.trigger.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         this.toggle();
                     });
 
-                    // Option selection
                     this.options.forEach((option, index) => {
                         option.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -540,7 +663,6 @@
                         });
                     });
 
-                    // Keyboard navigation
                     this.trigger.addEventListener('keydown', (e) => {
                         switch (e.key) {
                             case 'Enter':
@@ -564,14 +686,12 @@
                         }
                     });
 
-                    // Close on click outside
                     document.addEventListener('click', (e) => {
                         if (!this.container.contains(e.target)) {
                             this.close();
                         }
                     });
 
-                    // Close on select change from elsewhere
                     this.select.addEventListener('change', () => {
                         this.updateSelected();
                     });
@@ -587,7 +707,6 @@
                     this.menu.classList.add('is-open');
                     this.trigger.setAttribute('aria-expanded', 'true');
 
-                    // Scroll to selected option
                     const selectedIndex = this.select.selectedIndex;
                     if (selectedIndex >= 0) {
                         this.highlightOption(selectedIndex);
@@ -646,9 +765,8 @@
                 }
             }
 
-            // Initialize custom dropdowns on page load
             document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select.input-field');
+                const selects = document.querySelectorAll('select.brutal-input');
                 selects.forEach(select => new CustomDropdown(select));
             });
         </script>

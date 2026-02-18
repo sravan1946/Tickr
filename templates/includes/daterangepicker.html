@@ -1,6 +1,6 @@
 {% load static %}
 {% comment %}
-Date Range Picker - Styled to match form design
+Date Range Picker - Styled to match brutalist form design
 
 Arguments:
 - start_field: The form field for start date
@@ -11,36 +11,36 @@ Arguments:
 
 <div class="space-y-6">
     <div>
-        <label for="{{ start_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-            {{ start_label|default:"Start Date & Time" }}
+        <label for="{{ start_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">
+            {{ start_label|default:"START_DATE_TIME"|upper }}
         </label>
         <input 
             type="datetime-local" 
             name="{{ start_field.name }}" 
             id="{{ start_field.id_for_label }}"
-            class="input-field w-full px-4 py-3 rounded-xl"
-            value="{{ start_field.value|date:'Y-m-d\\TH:i'|default:'' }}"
+            class="brutal-input w-full"
+            value="{{ start_field.value|date:'Y-m-d\TH:i'|default:'' }}"
             {% if start_field.field.required %}required{% endif %}
         >
         {% if start_field.errors %}
-            <div class="mt-2 text-red-400 text-sm">{{ start_field.errors }}</div>
+            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ start_field.errors }}</div>
         {% endif %}
     </div>
 
     <div>
-        <label for="{{ end_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-            {{ end_label|default:"End Date & Time" }}
+        <label for="{{ end_field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">
+            {{ end_label|default:"END_DATE_TIME"|upper }}
         </label>
         <input 
             type="datetime-local" 
             name="{{ end_field.name }}" 
             id="{{ end_field.id_for_label }}"
-            class="input-field w-full px-4 py-3 rounded-xl"
-            value="{{ end_field.value|date:'Y-m-d\\TH:i'|default:'' }}"
+            class="brutal-input w-full"
+            value="{{ end_field.value|date:'Y-m-d\TH:i'|default:'' }}"
             {% if end_field.field.required %}required{% endif %}
         >
         {% if end_field.errors %}
-            <div class="mt-2 text-red-400 text-sm">{{ end_field.errors }}</div>
+            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ end_field.errors }}</div>
         {% endif %}
     </div>
 </div>

@@ -5,13 +5,13 @@
 {% block content %}
 <div class="min-h-[80vh] flex items-center justify-center py-12">
     <div class="w-full max-w-md px-4">
-        <div class="glass-card rounded-2xl p-8">
+        <div class="brutal-card border-technical p-8">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center mx-auto mb-4">
-                    <span class="text-dark-900 font-display text-2xl font-bold">T</span>
+                <div class="w-16 h-16 bg-brutal-cyan flex items-center justify-center mx-auto mb-4 border-2 border-brutal-cyan">
+                    <span class="text-white font-mono text-2xl font-bold">T</span>
                 </div>
-                <h1 class="font-display text-2xl font-bold text-white mb-2">Create account</h1>
-                <p class="text-gray-400">Join Tickr to discover and create events</p>
+                <h1 class="font-mono text-2xl font-bold text-white mb-2 tracking-wider">REGISTRATION</h1>
+                <p class="text-gray-400 font-mono text-sm">// Initialize new user account</p>
             </div>
             
             <form method="post" action="{% url 'accounts:register' %}" class="space-y-5">
@@ -22,46 +22,46 @@
                 
                 {% for field in form %}
                     {% if field.field.widget.input_type == "checkbox" %}
-                        <div class="p-4 rounded-xl bg-dark-700/50 border border-white/5">
+                        <div class="p-4 border border-brutal-lightgray bg-brutal-gray">
                             <label class="form-checkbox-wrapper">
                                 <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
                                 <span class="form-checkbox-switch"></span>
                                 <span class="form-checkbox-label">{{ field.label }}</span>
                             </label>
                             {% if field.help_text %}
-                                <p class="text-gray-500 text-sm mt-2 ml-14">{{ field.help_text }}</p>
+                                <p class="text-gray-500 text-sm mt-2 ml-14 font-mono">{{ field.help_text }}</p>
                             {% endif %}
                         </div>
                     {% else %}
                         <div>
-                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                             <input type="{% if 'password' in field.name %}password{% elif 'email' in field.name %}email{% else %}text{% endif %}" 
                                 name="{{ field.name }}" 
                                 id="{{ field.id_for_label }}"
                                 value="{{ field.value|default:'' }}"
-                                class="input-field w-full px-4 py-3 rounded-xl"
+                                class="brutal-input w-full"
                                 placeholder="{% if 'username' in field.name %}Choose a username{% elif 'email' in field.name %}Enter your email{% elif 'password' in field.name %}Create a password{% endif %}"
                                 {% if field.field.required %}required{% endif %}>
                             {% if field.errors %}
-                                <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                                <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                             {% endif %}
                             {% if field.help_text and 'password' not in field.name %}
-                                <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                             {% endif %}
                         </div>
                     {% endif %}
                 {% endfor %}
                 
-                <button type="submit" class="btn-primary w-full py-4 rounded-xl font-semibold">
-                    Create Account
+                <button type="submit" class="brutal-btn w-full">
+                    CREATE_ACCOUNT_
                 </button>
             </form>
             
             <div class="mt-8 text-center">
-                <p class="text-gray-400">
-                    Already have an account? 
-                    <a href="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}" class="text-neon-cyan hover:underline font-medium">
-                        Sign in
+                <p class="text-gray-400 font-mono text-sm">
+                    Existing user? 
+                    <a href="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}" class="text-brutal-cyan hover:underline font-bold">
+                        [LOGIN]
                     </a>
                 </p>
             </div>

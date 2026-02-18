@@ -15,14 +15,18 @@ class EventListView(View):
     """GET /events/ — list. POST /events/ — create (organizer only, per spec)."""
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        events = Event.objects.filter(is_published=True, is_cancelled=False).order_by(
-            "-start_date"
+        events = (
+            Event.objects.filter(is_published=True, is_cancelled=False)
+            .order_by("-start_date")
+            .prefetch_related("ticket_types")
         )
         organizer_profile = get_organizer_profile(request)
         my_events: list[Event] = []
         if organizer_profile:
             my_events = list(
-                Event.objects.filter(organizer=organizer_profile).order_by("-created_at")
+                Event.objects.filter(organizer=organizer_profile)
+                .order_by("-created_at")
+                .prefetch_related("ticket_types")
             )
         return render(
             request,

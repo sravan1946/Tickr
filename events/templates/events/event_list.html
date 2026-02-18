@@ -7,16 +7,13 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
         <div>
-            <h1 class="font-display text-4xl font-bold text-white mb-2">Discover Events</h1>
-            <p class="text-gray-400">Find and book tickets for amazing experiences</p>
+            <span class="font-mono text-sm text-gray-500 tracking-widest block mb-2">// EVENT_REPOSITORY</span>
+            <h1 class="font-mono text-4xl font-bold text-white tracking-tighter">DISCOVER_EVENTS</h1>
         </div>
         {% if account_user.is_organizer %}
-        <a href="{% url 'events:event_create' %}"
-            class="btn-primary px-6 py-3 rounded-xl font-semibold flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Create Event
+        <a href="{% url 'events:event_create' %}" class="brutal-btn flex items-center gap-2">
+            <span>+</span>
+            CREATE_EVENT_
         </a>
         {% endif %}
     </div>
@@ -24,56 +21,52 @@
     <!-- My Events Section (for organizers) -->
     {% if my_events %}
     <section class="mb-12">
-        <div class="flex items-center gap-2 mb-6">
-            <div class="w-1 h-6 bg-gradient-to-b from-neon-cyan to-neon-purple rounded-full"></div>
-            <h2 class="font-display text-2xl font-semibold text-white">My Events</h2>
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-px flex-1 bg-brutal-lightgray"></div>
+            <span class="font-mono text-sm text-gray-500 tracking-widest">// MY_EVENTS</span>
+            <div class="h-px flex-1 bg-brutal-lightgray"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for event in my_events %}
-            <div
-                class="glass-card rounded-2xl overflow-hidden group hover:border-neon-cyan/30 transition-all duration-300">
-                <div class="h-32 bg-gradient-to-br from-dark-600 to-dark-700 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark-800 to-transparent"></div>
+            <div class="brutal-card border-technical overflow-hidden group hover:border-brutal-red">
+                <div class="h-32 bg-brutal-gray relative overflow-hidden border-b-2 border-brutal-lightgray">
                     {% if not event.is_published %}
-                    <div
-                        class="absolute top-3 left-3 px-3 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-medium">
-                        Draft
+                    <div class="absolute top-3 left-3 px-3 py-1 border border-yellow-600 text-yellow-500 text-xs font-mono">
+                        [DRAFT]
                     </div>
                     {% endif %}
                     {% if event.is_cancelled %}
-                    <div
-                        class="absolute top-3 left-3 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-medium">
-                        Cancelled
+                    <div class="absolute top-3 left-3 px-3 py-1 border border-brutal-red text-brutal-red text-xs font-mono">
+                        [CANCELLED]
                     </div>
                     {% endif %}
                 </div>
                 <div class="p-6">
-                    <h3
-                        class="font-display text-lg font-semibold text-white mb-2 group-hover:text-neon-cyan transition-colors">
+                    <h3 class="font-mono text-lg font-bold text-white mb-2 tracking-wider group-hover:text-brutal-red transition-colors">
                         {{ event.title }}
                     </h3>
-                    <div class="flex items-center gap-4 text-sm text-gray-400 mb-4">
+                    <div class="flex items-center gap-4 text-sm font-mono text-gray-400 mb-4">
                         <span class="flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {{ event.start_date|date:"M j" }}
+                            <span class="text-brutal-cyan">></span>
+                            {{ event.start_date|date:"Y-m-d" }}
                         </span>
                         <span class="flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
+                            <span class="text-brutal-cyan">@</span>
                             {{ event.venue.name }}
                         </span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 text-sm font-mono">
+                        <span class="text-gray-500">SEATS:</span>
+                        <span class="{% if event.total_tickets_remaining > 10 %}text-brutal-green{% elif event.total_tickets_remaining > 0 %}text-yellow-500{% else %}text-brutal-red{% endif %}">
+                            {{ event.total_tickets_remaining }} / {{ event.capacity }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
                         <a href="{% url 'events:event_detail' slug=event.slug %}"
-                            class="flex-1 btn-secondary py-2 rounded-lg text-sm font-medium text-center">View</a>
+                            class="flex-1 brutal-btn-outline py-2 text-sm text-center">VIEW_</a>
                         <a href="{% url 'events:event_edit' pk=event.pk %}"
-                            class="flex-1 btn-secondary py-2 rounded-lg text-sm font-medium text-center">Edit</a>
+                            class="flex-1 brutal-btn-outline py-2 text-sm text-center">EDIT_</a>
                     </div>
                 </div>
             </div>
@@ -84,62 +77,51 @@
 
     <!-- All Events Section -->
     <section>
-        <div class="flex items-center gap-2 mb-6">
-            <div class="w-1 h-6 bg-gradient-to-b from-neon-purple to-neon-pink rounded-full"></div>
-            <h2 class="font-display text-2xl font-semibold text-white">Upcoming Events</h2>
+        <div class="flex items-center gap-4 mb-6">
+            <div class="h-px flex-1 bg-brutal-lightgray"></div>
+            <span class="font-mono text-sm text-gray-500 tracking-widest">// UPCOMING_EVENTS</span>
+            <div class="h-px flex-1 bg-brutal-lightgray"></div>
         </div>
 
         {% if events %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for event in events %}
             <a href="{% url 'events:event_detail' slug=event.slug %}"
-                class="glass-card rounded-2xl overflow-hidden group hover:scale-[1.02] hover:border-neon-cyan/30 transition-all duration-300">
-                <div class="h-48 bg-gradient-to-br from-dark-600 to-dark-700 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-t from-dark-800 via-transparent to-transparent"></div>
+                class="brutal-card border-technical overflow-hidden group hover:border-brutal-red">
+                <div class="h-48 bg-brutal-gray relative overflow-hidden border-b-2 border-brutal-lightgray">
                     <div class="absolute bottom-4 left-4 right-4">
-                        <span
-                            class="inline-block px-3 py-1 rounded-full bg-neon-cyan/20 border border-neon-cyan/30 text-neon-cyan text-xs font-medium mb-2">
-                            {{ event.category.name }}
+                        <span class="inline-block px-3 py-1 border border-brutal-cyan text-brutal-cyan text-xs font-mono">
+                            {{ event.category.name|upper }}
                         </span>
                     </div>
                 </div>
                 <div class="p-6">
-                    <h3
-                        class="font-display text-xl font-semibold text-white mb-3 group-hover:text-neon-cyan transition-colors line-clamp-2">
+                    <h3 class="font-mono text-xl font-bold text-white mb-3 group-hover:text-brutal-red transition-colors line-clamp-2 tracking-tight">
                         {{ event.title }}
                     </h3>
-                    <div class="space-y-2 text-sm text-gray-400">
+                    <div class="space-y-2 text-sm font-mono text-gray-400">
                         <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>{{ event.start_date|date:"l, F j, Y" }}</span>
+                            <span class="text-brutal-cyan">DATE</span>
+                            <span>{{ event.start_date|date:"Y-m-d" }}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>{{ event.start_date|date:"g:i A" }} - {{ event.end_date|date:"g:i A" }}</span>
+                            <span class="text-brutal-cyan">TIME</span>
+                            <span>{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
+                            <span class="text-brutal-cyan">LOC_</span>
                             <span>{{ event.venue.name }}, {{ event.venue.city }}</span>
                         </div>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Capacity: {{ event.capacity }}</span>
-                        <span
-                            class="text-neon-cyan text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                            Get Tickets
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg>
+                    <div class="mt-4 pt-4 border-t border-brutal-lightgray flex items-center justify-between">
+                        <span class="text-sm font-mono">
+                            <span class="text-gray-500">SEATS:</span>
+                            <span class="{% if event.total_tickets_remaining > 10 %}text-brutal-green{% elif event.total_tickets_remaining > 0 %}text-yellow-500{% else %}text-brutal-red{% endif %}">
+                                {{ event.total_tickets_remaining }} / {{ event.capacity }}
+                            </span>
+                        </span>
+                        <span class="{% if event.total_tickets_remaining > 0 %}text-brutal-green{% else %}text-gray-500{% endif %} text-sm font-mono font-bold">
+                            {% if event.total_tickets_remaining > 0 %}> GET_TICKETS{% else %}> SOLD OUT{% endif %}
                         </span>
                     </div>
                 </div>
@@ -147,17 +129,14 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="glass-card rounded-2xl p-12 text-center">
-            <div class="w-16 h-16 rounded-full bg-dark-700 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+        <div class="brutal-card border-technical p-12 text-center">
+            <div class="w-16 h-16 bg-brutal-gray border border-brutal-lightgray flex items-center justify-center mx-auto mb-4">
+                <span class="font-mono text-2xl text-gray-500">∅</span>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-2">No events yet</h3>
-            <p class="text-gray-400 mb-6">Check back later for upcoming events or browse categories.</p>
-            <a href="{% url 'category_list' %}" class="btn-secondary px-6 py-3 rounded-xl inline-block">
-                Browse Categories
+            <h3 class="text-xl font-bold text-white mb-2 font-mono">NO_EVENTS_FOUND</h3>
+            <p class="text-gray-400 mb-6 font-mono">Repository empty. Check back later.</p>
+            <a href="{% url 'category_list' %}" class="brutal-btn-outline px-6 py-3 inline-block">
+                BROWSE_CATEGORIES_
             </a>
         </div>
         {% endif %}
@@ -166,18 +145,13 @@
     <!-- Quick Links -->
     <section class="mt-12 flex flex-wrap items-center gap-4">
         <a href="{% url 'category_list' %}"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg glass-card text-sm text-gray-300 hover:text-white hover:border-neon-cyan/30 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-            </svg>
+            class="flex items-center gap-2 px-4 py-2 border border-brutal-lightgray font-mono text-sm text-gray-400 hover:text-white hover:border-brutal-red transition-all">
+            <span class="text-brutal-cyan">></span>
             Browse Categories
         </a>
         <a href="{% url 'venue_list' %}"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg glass-card text-sm text-gray-300 hover:text-white hover:border-neon-cyan/30 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
+            class="flex items-center gap-2 px-4 py-2 border border-brutal-lightgray font-mono text-sm text-gray-400 hover:text-white hover:border-brutal-red transition-all">
+            <span class="text-brutal-cyan">></span>
             View Venues
         </a>
     </section>

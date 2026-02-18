@@ -4,8 +4,9 @@
 {% block title %}Ticket Types — {{ event.title }}{% endblock %}
 
 {% block nav %}
-<a href="{% url 'events:event_list' %}" class="nav-link text-sm font-medium">Events</a>
-<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link text-sm font-medium">{{ event.title }}</a>
+<a href="{% url 'events:event_list' %}" class="nav-link">Events</a>
+<span class="text-gray-600">|</span>
+<a href="{% url 'events:event_detail' slug=event.slug %}" class="nav-link">{{ event.title|truncatechars:20 }}</a>
 {% endblock %}
 
 {% block extra_css %}
@@ -14,12 +15,15 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="glass-card rounded-2xl p-6 md:p-8">
-        <h1 class="text-3xl font-display font-bold text-white mb-6">Ticket Types — {{ event.title }}</h1>
+    <div class="mb-8">
+        <span class="font-mono text-sm text-gray-500 tracking-widest block mb-2">// TICKET_MANAGEMENT</span>
+        <h1 class="font-mono text-3xl font-bold text-white tracking-tighter">TICKET_TYPES — {{ event.title|upper }}</h1>
+    </div>
 
+    <div class="brutal-card border-technical p-6 md:p-8">
         {% if is_owner %}
-        <div class="mb-8 p-6 border border-white/10 rounded-xl bg-dark-800/30">
-            <h2 class="text-xl font-display font-semibold text-white mb-4">Add a Ticket Type</h2>
+        <div class="mb-8 p-6 border-2 border-brutal-lightgray bg-brutal-dark">
+            <h2 class="text-xl font-mono font-bold text-white mb-4 tracking-wider">ADD_TICKET_TYPE</h2>
             <form method="post" action="{% url 'events:event_tickets' pk=event.pk %}" class="space-y-4">
                 {% csrf_token %}
                 {% for field in form %}
@@ -31,49 +35,49 @@
                 {# Skip, handled with sale_start #}
                 {% else %}
                 <div>
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                    <input type="{% if 'price' in field.name or 'quantity' in field.name %}number{% else %}text{% endif %}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}" class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
+                    <input type="{% if 'price' in field.name or 'quantity' in field.name %}number{% else %}text{% endif %}" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
                     {% if field.errors %}
-                    <p class="mt-2 text-red-400 text-sm">{{ field.errors }}</p>
+                    <p class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</p>
                     {% endif %}
                     {% if field.help_text %}
-                    <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                    <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                     {% endif %}
                 </div>
                 {% endif %}
                 {% endfor %}
-                <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-semibold">Create Ticket Type</button>
+                <button type="submit" class="brutal-btn">CREATE_TYPE_</button>
             </form>
         </div>
         {% endif %}
 
         {% if ticket_types %}
         <div class="space-y-4">
-            <h2 class="text-xl font-display font-semibold text-white">Available Ticket Types</h2>
+            <h2 class="text-xl font-mono font-bold text-white tracking-wider mb-4">// AVAILABLE_TYPES</h2>
             {% for ticket_type in ticket_types %}
-            <div class="p-4 border border-white/10 rounded-xl bg-dark-800/30">
+            <div class="p-4 border-2 border-brutal-lightgray bg-brutal-dark">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-white mb-2">{{ ticket_type.name }}</h3>
-                        <p class="text-gray-400 text-sm space-y-1">
-                            <span class="block">Price: ${{ ticket_type.price }}</span>
-                            <span class="block">Available: {{ ticket_type.quantity_available }} / {{ ticket_type.quantity_total }}</span>
-                            <span class="block">Sale period: {{ ticket_type.sale_start|date:"M j, Y g:i A" }} – {{ ticket_type.sale_end|date:"M j, Y g:i A" }}</span>
-                            <span class="block">Status:
+                        <h3 class="text-lg font-mono font-bold text-white mb-2 tracking-wider">{{ ticket_type.name }}</h3>
+                        <p class="text-gray-400 text-sm space-y-1 font-mono">
+                            <span class="block"><span class="text-brutal-cyan">PRICE:</span> ${{ ticket_type.price }}</span>
+                            <span class="block"><span class="text-brutal-cyan">AVAILABLE:</span> {{ ticket_type.quantity_available }} / {{ ticket_type.quantity_total }}</span>
+                            <span class="block"><span class="text-brutal-cyan">SALE:</span> {{ ticket_type.sale_start|date:"Y-m-d H:i" }} – {{ ticket_type.sale_end|date:"Y-m-d H:i" }}</span>
+                            <span class="block"><span class="text-brutal-cyan">STATUS:</span>
                                 {% if ticket_type.is_on_sale %}
-                                <span class="text-green-400">On Sale</span>
+                                <span class="text-green-500">[ON_SALE]</span>
                                 {% elif not ticket_type.is_active %}
-                                <span class="text-gray-500">Inactive</span>
+                                <span class="text-gray-500">[INACTIVE]</span>
                                 {% else %}
-                                <span class="text-gray-500">Not on sale</span>
+                                <span class="text-gray-500">[NOT_ON_SALE]</span>
                                 {% endif %}
                             </span>
                         </p>
                     </div>
                     {% if is_owner %}
                     <div class="flex gap-2">
-                        <a href="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="btn-secondary px-3 py-1.5 rounded-lg text-sm">Edit</a>
-                        <a href="{% url 'tickets:ticket_type_delete' pk=ticket_type.pk %}" class="bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 px-3 py-1.5 rounded-lg text-sm transition-colors">Delete</a>
+                        <a href="{% url 'tickets:ticket_type_update' pk=ticket_type.pk %}" class="brutal-btn-outline px-3 py-1.5 text-sm">EDIT_</a>
+                        <a href="{% url 'tickets:ticket_type_delete' pk=ticket_type.pk %}" class="bg-brutal-red/10 border border-brutal-red text-brutal-red hover:bg-brutal-red hover:text-white px-3 py-1.5 text-sm font-mono transition-colors">DELETE_</a>
                     </div>
                     {% endif %}
                 </div>
@@ -81,7 +85,7 @@
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-gray-400 text-center py-8">
+        <p class="text-gray-400 text-center py-8 font-mono">
             {% if is_owner %}
             No ticket types yet. Create one to start selling tickets.
             {% else %}
@@ -91,7 +95,7 @@
         {% endif %}
 
         <div class="mt-8">
-            <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn-secondary px-4 py-2 rounded-lg text-sm">Back to event</a>
+            <a href="{% url 'events:event_detail' slug=event.slug %}" class="brutal-btn-outline px-4 py-2 text-sm">BACK_TO_EVENT_</a>
         </div>
     </div>
 </div>

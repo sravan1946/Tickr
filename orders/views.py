@@ -355,20 +355,64 @@ class AttendeeCreateView(View):
             messages.error(request, "You do not have access to this order.")
             return redirect("my_orders")
 
-        created_count = 0
+        # Reconstruct the list of items with bound forms
+        items_with_forms = []
+        all_valid = True
+        forms_to_save = []
+
         for item in order.items.select_related("ticket_type").all():
-            existing = item.attendees.count()
-            needed = item.quantity - existing
+            existing_attendees = item.attendees.all()
+            existing_count = existing_attendees.count()
+            needed = item.quantity - existing_count
+
+            # Create bound forms for this item
+            item_forms = []
             for i in range(needed):
-                form = AttendeeForm(request.POST, prefix=f"att-{item.pk}-{i}")
-                if form.is_valid():
+                prefix = f"att-{item.pk}-{i}"
+                form = AttendeeForm(request.POST, prefix=prefix)
+                if not form.is_valid():
+                    all_valid = False
+                else:
+                    # Don't save yet, just prepare
                     attendee = form.save(commit=False)
                     attendee.order_item = item
-                    attendee.save()
-                    created_count += 1
+                    forms_to_save.append(attendee)
+                item_forms.append(form)
 
-        if created_count:
-            messages.success(request, f"{created_count} attendee(s) added.")
-        else:
-            messages.warning(request, "No attendees added. Check your input.")
+            items_with_forms.append({
+                "item": item,
+                "existing": existing_attendees,
+                "forms": item_forms,
+                "needed": needed,
+            })
+
+        if all_valid and forms_to_save:
+            # Save all attendees
+            for attendee in forms_to_save:
+                attendee.save()
+
+            count = len(forms_to_save)
+            messages.success(request, f"{count} attendee(s) added.")
+            return redirect("orders:order_detail", pk=order.pk)
+
+        elif not all_valid:
+            messages.error(request, "Please correct the errors below.")
+            return render(request, "orders/attendee_form.html", {
+                "order": order,
+                "items_with_forms": items_with_forms,
+                "event": order.event,
+            })
+
+        # If we got here, maybe no forms were submitted/needed (edge case)
+        # or the user just hit save without filling anything new (if needed > 0 but valid?)
+        # Logic above implies if needed > 0, forms are created. If empty, is_valid might be false depending on required fields.
+        # AttendeeForm fields are required by default.
+
+        # If needed was 0 for all items, items_with_forms would have empty forms list.
+        # In that case forms_to_save is empty, all_valid is True.
+        # So we should redirect?
+        if not forms_to_save:
+             messages.info(request, "No new attendees were added.")
+             return redirect("orders:order_detail", pk=order.pk)
+
         return redirect("orders:order_detail", pk=order.pk)

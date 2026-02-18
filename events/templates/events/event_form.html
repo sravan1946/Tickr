@@ -9,23 +9,17 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="glass-card rounded-2xl p-8">
+    <div class="brutal-card border-technical p-8">
         <div class="flex items-center gap-3 mb-8">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center">
-                <svg class="w-6 h-6 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {% if event %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    {% else %}
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    {% endif %}
-                </svg>
+            <div class="w-12 h-12 bg-brutal-cyan border border-brutal-cyan flex items-center justify-center">
+                <span class="font-mono font-bold text-xl text-white">{% if event %}ED{% else %}CR{% endif %}</span>
             </div>
             <div>
-                <h1 class="font-display text-2xl sm:text-3xl font-bold text-white">
-                    {% if event %}Edit Event{% else %}Create New Event{% endif %}
+                <h1 class="font-mono text-2xl sm:text-3xl font-bold text-white tracking-wider">
+                    {% if event %}EDIT_EVENT{% else %}CREATE_EVENT{% endif %}
                 </h1>
-                <p class="text-gray-400 text-sm">
-                    {% if event %}Update your event details{% else %}Fill in the details to create your event{% endif %}
+                <p class="text-gray-400 text-sm font-mono">
+                    {% if event %}// Update event details{% else %}// Initialize new event{% endif %}
                 </p>
             </div>
         </div>
@@ -42,30 +36,30 @@
                     {# Skip, handled with start_date #}
                 {% elif field.name == "description" %}
                     <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                         <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="5" 
-                            class="input-field w-full px-4 py-3 rounded-xl resize-none"
+                            class="brutal-input w-full resize-none"
                             {% if field.value %}placeholder="{{ field.value }}"{% endif %}>{{ field.value|default:'' }}</textarea>
                         {% if field.errors %}
-                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                         {% endif %}
                         {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                         {% endif %}
                     </div>
                 {% elif field.name == "category" or field.name == "venue" %}
                     <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
-                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
+                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
                             {% for choice in field.field.choices %}
                                 <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
                             {% endfor %}
                         </select>
                         {% if field.errors %}
-                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                         {% endif %}
                         {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                         {% endif %}
                     </div>
                 {% elif field.field.widget.input_type == "checkbox" %}
@@ -75,36 +69,33 @@
                         <span class="form-checkbox-label">{{ field.label }}</span>
                     </label>
                     {% if field.errors %}
-                        <div class="text-red-400 text-sm mt-2">{{ field.errors }}</div>
+                        <div class="text-brutal-red text-sm mt-2 font-mono">[ERROR] {{ field.errors }}</div>
                     {% endif %}
                 {% else %}
                     <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                         <input type="{{ field.field.widget.input_type|default:'text' }}" 
                             name="{{ field.name }}" 
                             id="{{ field.id_for_label }}"
                             value="{{ field.value|default:'' }}"
-                            class="input-field w-full px-4 py-3 rounded-xl"
+                            class="brutal-input w-full"
                             {% if field.field.required %}required{% endif %}>
                         {% if field.errors %}
-                            <div class="mt-2 text-red-400 text-sm">{{ field.errors }}</div>
+                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                         {% endif %}
                         {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                         {% endif %}
                     </div>
                 {% endif %}
             {% endfor %}
             
             <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                <button type="submit" class="btn-primary flex-1 py-4 rounded-xl font-semibold flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    {% if event %}Update Event{% else %}Create Event{% endif %}
+                <button type="submit" class="brutal-btn flex-1 flex items-center justify-center gap-2">
+                    {% if event %}UPDATE_{% else %}CREATE_{% endif %}
                 </button>
-                <a href="{% url 'events:event_list' %}" class="btn-secondary py-4 px-8 rounded-xl font-semibold text-center">
-                    Cancel
+                <a href="{% url 'events:event_list' %}" class="brutal-btn-outline py-4 px-8 text-center">
+                    CANCEL_
                 </a>
             </div>
         </form>

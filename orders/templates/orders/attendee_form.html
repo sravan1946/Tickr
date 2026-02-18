@@ -3,69 +3,83 @@
 {% block title %}Add Attendees — Order{% endblock %}
 
 {% block nav %}
-<a href="{% url 'orders:order_detail' pk=order.pk %}" class="nav-link text-sm font-medium">Order</a>
+<a href="{% url 'orders:order_detail' pk=order.pk %}" class="nav-link">Order</a>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="glass-card rounded-2xl p-6 md:p-8">
-        <h1 class="text-3xl font-display font-bold text-white mb-2">Add Attendees</h1>
-        <p class="text-gray-400 mb-8">
-            Order for <strong class="text-neon-cyan">{{ event.title }}</strong> — provide attendee details for each ticket.
+    <div class="mb-8">
+        <span class="font-mono text-sm text-gray-500 tracking-widest block mb-2">// ATTENDEE_MANAGEMENT</span>
+        <h1 class="font-mono text-3xl font-bold text-white tracking-tighter">ADD_ATTENDEES</h1>
+        <p class="text-gray-400 mt-2 font-mono">
+            Order for <span class="text-brutal-cyan">{{ event.title }}</span> — provide attendee details for each ticket.
         </p>
+    </div>
 
+    <div class="brutal-card border-technical p-6 md:p-8">
         <form method="post" action="{% url 'orders:order_attendees' pk=order.pk %}">
             {% csrf_token %}
 
             {% for entry in items_with_forms %}
-            <div class="border border-white/10 rounded-xl p-5 bg-dark-800/50 mb-6">
-                <h3 class="text-lg font-semibold text-white mb-4">{{ entry.item.ticket_type.name }} ({{ entry.item.quantity }}×)</h3>
+            <div class="border-2 border-brutal-lightgray bg-brutal-dark p-5 mb-6">
+                <h3 class="text-lg font-mono font-bold text-white mb-4 tracking-wider">
+                    {{entry.item.ticket_type.name|upper }} ({{ entry.item.quantity }}×)</h3>
 
                 {% if entry.existing %}
-                <p class="text-sm text-gray-400 mb-3">Already registered:</p>
+                <p class="text-sm text-gray-400 mb-3 font-mono">// ALREADY_REGISTERED:</p>
                 {% for att in entry.existing %}
-                <p class="text-sm text-gray-300 mb-1 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
+                <p class="text-sm text-gray-300 mb-1 flex items-center gap-2 font-mono">
+                    <span class="text-green-500 font-bold">[OK]</span>
                     {{ att.full_name }} ({{ att.email }})
                 </p>
                 {% endfor %}
                 {% endif %}
 
                 {% if entry.forms %}
-                <p class="text-sm text-white mt-4 mb-3">New attendees ({{ entry.needed }} remaining):</p>
+                <p class="text-sm text-white mt-4 mb-3 font-mono"><span class="text-brutal-cyan">></span> NEW_ATTENDEES
+                    ({{ entry.needed }} REMAINING):</p>
                 {% for form in entry.forms %}
-                <div class="flex flex-col sm:flex-row gap-3 mb-3">
-                    <input type="text" name="{{ form.full_name.name }}" placeholder="Full Name" 
-                        class="input-field flex-1 px-4 py-2.5 rounded-lg text-sm" required>
-                    <input type="email" name="{{ form.email.name }}" placeholder="Email Address" 
-                        class="input-field flex-1 px-4 py-2.5 rounded-lg text-sm" required>
+                <div class="flex flex-col sm:flex-row gap-3 mb-3 items-start">
+                    <div class="flex-1 w-full">
+                        <input type="text" name="{{ form.full_name.html_name }}"
+                            value="{{ form.full_name.value|default_if_none:'' }}" placeholder="FULL_NAME"
+                            class="brutal-input w-full text-sm {% if form.full_name.errors %}border-red-500 bg-red-900/10{% endif %}"
+                            required>
+                        {% if form.full_name.errors %}
+                        <div class="text-brutal-red text-xs mt-1 font-mono">
+                            {{ form.full_name.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex-1 w-full">
+                        <input type="email" name="{{ form.email.html_name }}"
+                            value="{{ form.email.value|default_if_none:'' }}" placeholder="EMAIL_ADDRESS"
+                            class="brutal-input w-full text-sm {% if form.email.errors %}border-red-500 bg-red-900/10{% endif %}"
+                            required>
+                        {% if form.email.errors %}
+                        <div class="text-brutal-red text-xs mt-1 font-mono">
+                            {{ form.email.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <p class="text-sm text-green-400 mt-3 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    All attendees registered.
+                <p class="text-sm text-green-500 mt-3 flex items-center gap-2 font-mono font-bold">
+                    [OK] ALL_ATTENDEES_REGISTERED
                 </p>
                 {% endif %}
             </div>
             {% endfor %}
 
             <div class="flex flex-wrap gap-3 mt-8">
-                <button type="submit" class="btn-primary px-6 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Save Attendees
+                <button type="submit" class="brutal-btn inline-flex items-center gap-2">
+                    SAVE_ATTENDEES_
                 </button>
-                <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn-secondary px-6 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Order
+                <a href="{% url 'orders:order_detail' pk=order.pk %}"
+                    class="brutal-btn-outline px-6 py-2.5 inline-flex items-center gap-2">
+                    BACK_TO_ORDER_
                 </a>
             </div>
         </form>

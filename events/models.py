@@ -25,8 +25,12 @@ class Venue(models.Model):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organizer = models.ForeignKey(OrganizerProfile, on_delete=models.CASCADE, related_name="events")
-    category = models.ForeignKey(EventCategory, on_delete=models.CASCADE, related_name="events")
+    organizer = models.ForeignKey(
+        OrganizerProfile, on_delete=models.CASCADE, related_name="events"
+    )
+    category = models.ForeignKey(
+        EventCategory, on_delete=models.CASCADE, related_name="events"
+    )
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name="events")
     title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True)
@@ -40,6 +44,13 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def total_tickets_remaining(self) -> int:
+        """Return total remaining tickets across all active ticket types."""
+        return sum(
+            tt.quantity_available for tt in self.ticket_types.filter(is_active=True)
+        )
 
 
 class EventImage(models.Model):

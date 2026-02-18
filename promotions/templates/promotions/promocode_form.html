@@ -5,18 +5,16 @@
 {% endblock %}
 
 {% block nav %}
-<a href="{% url 'event_promocode_list' pk=event.pk %}" class="nav-link text-sm font-medium">Promo Codes</a>
+<a href="{% url 'event_promocode_list' pk=event.pk %}" class="nav-link">Promo Codes</a>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="glass-card rounded-2xl p-6 md:p-8">
-        <h1 class="text-3xl font-display font-bold text-white mb-2">
-            {% if promo %}Edit Promo Code — <code
-                class="bg-dark-700 px-2 py-1 rounded text-neon-cyan text-lg">{{ promo.code }}</code>{% else %}Create
-            Promo Code{% endif %}
+    <div class="brutal-card border-technical p-6 md:p-8">
+        <h1 class="text-3xl font-mono font-bold text-white mb-2 tracking-wider">
+            {% if promo %}EDIT_PROMO — <code class="bg-brutal-gray px-2 py-1 text-brutal-cyan text-lg">{{ promo.code }}</code>{% else %}CREATE_PROMO_CODE{% endif %}
         </h1>
-        <p class="text-gray-400 mb-6">Event: {{ event.title }}</p>
+        <p class="text-gray-400 mb-6 font-mono">Event: {{ event.title }}</p>
 
         <form method="post"
             action="{% if promo %}{% url 'promotions:promocode_update' pk=promo.pk %}{% else %}{% url 'promotions:promocode_create' %}{% endif %}"
@@ -35,40 +33,41 @@
             </label>
             {% elif field.name == "discount_type" %}
             <div>
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                 <select name="{{ field.name }}" id="{{ field.id_for_label }}"
-                    class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                    class="brutal-input w-full" {% if field.field.required %}required{% endif %}
+                <option value="">---------</option>
                     {% for choice in field.field.choices %}
                     <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
                     {% endfor %}
                 </select>
                 {% if field.errors %}
-                <p class="mt-2 text-red-400 text-sm">{{ field.errors.0 }}</p>
+                <p class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors.0 }}</p>
                 {% endif %}
             </div>
             {% else %}
             <div>
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">{{ field.label }}</label>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                 <input
                     type="{% if 'date' in field.name %}datetime-local{% elif 'value' in field.name or 'limit' in field.name %}number{% else %}text{% endif %}"
                     name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
-                    class="input-field w-full px-4 py-3 rounded-xl" {% if field.field.required %}required{% endif %}>
+                    class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
                 {% if field.errors %}
-                <p class="mt-2 text-red-400 text-sm">{{ field.errors.0 }}</p>
+                <p class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors.0 }}</p>
                 {% endif %}
                 {% if field.help_text %}
-                <p class="mt-2 text-gray-500 text-sm">{{ field.help_text }}</p>
+                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
                 {% endif %}
             </div>
             {% endif %}
             {% endfor %}
 
             <div class="flex flex-wrap gap-3 pt-4">
-                <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-semibold">
-                    {% if promo %}Save Changes{% else %}Create Promo Code{% endif %}
+                <button type="submit" class="brutal-btn">
+                    {% if promo %}SAVE_CHANGES_{% else %}CREATE_PROMO_{% endif %}
                 </button>
                 <a href="{% url 'event_promocode_list' pk=event.pk %}"
-                    class="btn-secondary px-6 py-3 rounded-lg font-semibold">Cancel</a>
+                    class="brutal-btn-outline px-6 py-3">CANCEL_</a>
             </div>
         </form>
     </div>
