@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-secure-9a12ld8&m!x08ycdbp8%f!z=7v&y)d*3l_23w%6s&br8p^ep$_qa
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+    command: python manage.py runserver 0.0.0.0:8000
