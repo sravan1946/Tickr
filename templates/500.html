@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}500 Server Error{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center px-4">
+    <div class="text-center max-w-2xl">
+        <div class="relative inline-block mb-8">
+            <div class="text-[12rem] md:text-[16rem] font-mono font-black text-brutal-dark leading-none select-none" style="text-shadow: -2px -2px 0 #2a2a2a, 2px -2px 0 #2a2a2a, -2px 2px 0 #2a2a2a, 2px 2px 0 #2a2a2a;">
+                500
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-[12rem] md:text-[16rem] font-mono font-black text-brutal-red leading-none animate-pulse">
+                    500
+                </div>
+            </div>
+        </div>
+        
+        <div class="brutal-card p-8 mb-8">
+            <h1 class="font-mono text-3xl md:text-4xl font-bold mb-4 text-brutal-red">
+                INTERNAL_SERVER_ERROR
+            </h1>
+            <div class="h-px bg-brutal-lightgray my-4"></div>
+            <p class="font-mono text-gray-400 text-lg mb-2">
+                > ERROR_CODE: 500
+            </p>
+            <p class="font-mono text-gray-400 text-lg mb-2">
+                > MESSAGE: Something went wrong on our end
+            </p>
+            <p class="font-mono text-gray-500 text-sm">
+                > STATUS: SYSTEM_MALFUNCTION
+            </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home' %}" class="brutal-btn inline-block">
+                [RETURN_HOME]
+            </a>
+            <button onclick="location.reload()" class="brutal-btn-outline inline-block">
+                [RETRY_REQUEST]
+            </button>
+        </div>
+        
+        <div class="mt-12 font-mono text-xs text-gray-600">
+            <span class="text-brutal-red">[!]</span> Our team has been notified. Please try again later
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}400 Bad Request{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center px-4">
+    <div class="text-center max-w-2xl">
+        <div class="relative inline-block mb-8">
+            <div class="text-[12rem] md:text-[16rem] font-mono font-black text-brutal-dark leading-none select-none" style="text-shadow: -2px -2px 0 #2a2a2a, 2px -2px 0 #2a2a2a, -2px 2px 0 #2a2a2a, 2px 2px 0 #2a2a2a;">
+                400
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-[12rem] md:text-[16rem] font-mono font-black text-brutal-red leading-none animate-pulse">
+                    400
+                </div>
+            </div>
+        </div>
+        
+        <div class="brutal-card p-8 mb-8">
+            <h1 class="font-mono text-3xl md:text-4xl font-bold mb-4 text-brutal-red">
+                BAD_REQUEST
+            </h1>
+            <div class="h-px bg-brutal-lightgray my-4"></div>
+            <p class="font-mono text-gray-400 text-lg mb-2">
+                > ERROR_CODE: 400
+            </p>
+            <p class="font-mono text-gray-400 text-lg mb-2">
+                > MESSAGE: The request could not be understood
+            </p>
+            <p class="font-mono text-gray-500 text-sm">
+                > STATUS: INVALID_REQUEST_FORMAT
+            </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home' %}" class="brutal-btn inline-block">
+                [RETURN_HOME]
+            </a>
+            <button onclick="history.back()" class="brutal-btn-outline inline-block">
+                [GO_BACK]
+            </button>
+        </div>
+        
+        <div class="mt-12 font-mono text-xs text-gray-600">
+            <span class="text-brutal-red">[!]</span> Please check your request and try again
+        </div>
+    </div>
+</div>
+{% endblock %}
