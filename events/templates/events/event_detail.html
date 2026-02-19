@@ -26,6 +26,15 @@
         <h1 class="font-mono text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tighter mb-6">
             {{ event.title }}
         </h1>
+        
+        <!-- Primary Image -->
+        {% for image in event.images.all %}
+        {% if image.is_primary %}
+        <div class="mt-6 max-w-3xl">
+            <img src="{{ image.image.url }}" alt="{{ event.title }}" class="w-full h-auto max-h-96 object-cover border-2 border-brutal-lightgray">
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
 </div>
 
@@ -81,7 +90,7 @@
                     </div>
                     <h3 class="font-mono text-lg font-bold text-white tracking-wider">ORGANIZER_TOOLS</h3>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                     <a href="{% url 'events:event_edit' pk=event.pk %}"
                         class="brutal-btn-outline py-3 text-sm text-center flex flex-col items-center gap-2">
                         <span class="text-brutal-cyan font-bold">ED</span>
@@ -96,6 +105,11 @@
                         class="brutal-btn-outline py-3 text-sm text-center flex flex-col items-center gap-2">
                         <span class="text-brutal-cyan font-bold">PR</span>
                         Promo Codes
+                    </a>
+                    <a href="{% url 'events:event_images' pk=event.pk %}"
+                        class="brutal-btn-outline py-3 text-sm text-center flex flex-col items-center gap-2">
+                        <span class="text-brutal-cyan font-bold">IMG</span>
+                        Images
                     </a>
                     <a href="{% url 'checkin:checkin_scan' pk=event.pk %}"
                         class="brutal-btn-outline py-3 text-sm text-center flex flex-col items-center gap-2">

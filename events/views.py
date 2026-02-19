@@ -7,8 +7,8 @@ from django.utils.decorators import method_decorator
 from core.decorators import organizer_required
 from core.helpers import get_organizer_profile, event_owned_by_user
 
-from .models import Event, EventCategory, Venue
-from .forms import EventForm
+from .models import Event, EventCategory, Venue, EventImage
+from .forms import EventForm, EventImageForm
 
 
 class EventListView(View):
@@ -145,3 +145,74 @@ class VenueListView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         venues = Venue.objects.order_by("city", "name")
         return render(request, "events/venue_list.html", {"venues": venues})
+
+
+class EventImageListView(View):
+    """GET /events/<id>/images/ — list images for an event."""
+
+    @method_decorator(organizer_required)
+    def get(self, request: HttpRequest, pk: str) -> HttpResponse:
+        event = get_object_or_404(Event, pk=pk)
+        if not event_owned_by_user(request, event):
+            messages.error(request, "You can only manage images for your own events.")
+            return redirect("events:event_list")
+        images = event.images.all()
+        form = EventImageForm()
+        return render(
+            request,
+            "events/event_images.html",
+            {"event": event, "images": images, "form": form},
+        )
+
+    @method_decorator(organizer_required)
+    def post(self, request: HttpRequest, pk: str) -> HttpResponse:
+        event = get_object_or_404(Event, pk=pk)
+        if not event_owned_by_user(request, event):
+            messages.error(request, "You can only manage images for your own events.")
+            return redirect("events:event_list")
+        form = EventImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save(event=event)
+            messages.success(request, "Image uploaded successfully.")
+            return redirect("events:event_images", pk=event.pk)
+        images = event.images.all()
+        return render(
+            request,
+            "events/event_images.html",
+            {"event": event, "images": images, "form": form},
+            status=400,
+        )
+
+
+class EventImageDeleteView(View):
+    """POST /events/<id>/images/<image_id>/delete/ — delete an image."""
+
+    @method_decorator(organizer_required)
+    def post(self, request: HttpRequest, pk: str, image_pk: str) -> HttpResponse:
+        event = get_object_or_404(Event, pk=pk)
+        if not event_owned_by_user(request, event):
+            messages.error(request, "You can only delete images for your own events.")
+            return redirect("events:event_list")
+        image = get_object_or_404(EventImage, pk=image_pk, event=event)
+        image.delete()
+        messages.success(request, "Image deleted.")
+        return redirect("events:event_images", pk=event.pk)
+
+
+class EventImageSetPrimaryView(View):
+    """POST /events/<id>/images/<image_id>/primary/ — set image as primary."""
+
+    @method_decorator(organizer_required)
+    def post(self, request: HttpRequest, pk: str, image_pk: str) -> HttpResponse:
+        event = get_object_or_404(Event, pk=pk)
+        if not event_owned_by_user(request, event):
+            messages.error(request, "You can only manage images for your own events.")
+            return redirect("events:event_list")
+        image = get_object_or_404(EventImage, pk=image_pk, event=event)
+        # Unset other primary images
+        event.images.filter(is_primary=True).update(is_primary=False)
+        # Set this one as primary
+        image.is_primary = True
+        image.save()
+        messages.success(request, "Primary image updated.")
+        return redirect("events:event_images", pk=event.pk)

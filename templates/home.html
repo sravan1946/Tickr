@@ -58,25 +58,7 @@
                 {% endif %}
             </div>
 
-            <!-- Technical specs -->
-            <div class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-brutal-lightgray pt-8">
-                <div>
-                    <div class="data-label">Latency</div>
-                    <div class="data-value">< 50ms</div>
-                </div>
-                <div>
-                    <div class="data-label">Uptime</div>
-                    <div class="data-value text-brutal-green">99.99%</div>
-                </div>
-                <div>
-                    <div class="data-label">Security</div>
-                    <div class="data-value">AES-256</div>
-                </div>
-                <div>
-                    <div class="data-label">Support</div>
-                    <div class="data-value">24/7</div>
-                </div>
-            </div>
+
         </div>
     </div>
 
@@ -85,29 +67,7 @@
     <div class="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-brutal-lightgray"></div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-16 bg-brutal-dark border-b-2 border-brutal-lightgray">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-brutal-lightgray">
-            <div class="bg-brutal-black p-8 text-center">
-                <div class="data-label mb-2">Total Events</div>
-                <div class="font-mono font-bold text-4xl sm:text-5xl">50K+</div>
-            </div>
-            <div class="bg-brutal-black p-8 text-center">
-                <div class="data-label mb-2">Tickets Sold</div>
-                <div class="font-mono font-bold text-4xl sm:text-5xl text-brutal-cyan">2M+</div>
-            </div>
-            <div class="bg-brutal-black p-8 text-center">
-                <div class="data-label mb-2">Organizers</div>
-                <div class="font-mono font-bold text-4xl sm:text-5xl">15K+</div>
-            </div>
-            <div class="bg-brutal-black p-8 text-center">
-                <div class="data-label mb-2">Countries</div>
-                <div class="font-mono font-bold text-4xl sm:text-5xl">87</div>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <!-- Features Section -->
 <section class="py-24">
@@ -188,35 +148,34 @@
                 <div class="space-y-4">
                     <div class="flex items-center gap-4 border-l-4 border-brutal-cyan pl-4">
                         <span class="font-mono text-brutal-cyan font-bold">></span>
-                        <span class="font-mono">Load balanced across 12 regions</span>
+                        <span class="font-mono">Simple event creation and management</span>
                     </div>
                     <div class="flex items-center gap-4 border-l-4 border-brutal-cyan pl-4">
                         <span class="font-mono text-brutal-cyan font-bold">></span>
-                        <span class="font-mono">Sub-100ms response times globally</span>
+                        <span class="font-mono">Multiple ticket types and pricing options</span>
                     </div>
                     <div class="flex items-center gap-4 border-l-4 border-brutal-cyan pl-4">
                         <span class="font-mono text-brutal-cyan font-bold">></span>
-                        <span class="font-mono">SOC2 Type II certified</span>
+                        <span class="font-mono">Secure payment processing</span>
                     </div>
                     <div class="flex items-center gap-4 border-l-4 border-brutal-cyan pl-4">
                         <span class="font-mono text-brutal-cyan font-bold">></span>
-                        <span class="font-mono">GDPR & CCPA compliant</span>
+                        <span class="font-mono">QR code check-in system</span>
                     </div>
                 </div>
             </div>
             
             <div class="brutal-card border-technical p-8">
-                <div class="font-mono text-sm text-gray-500 mb-4">// TERMINAL_OUTPUT</div>
+                <div class="font-mono text-sm text-gray-500 mb-4">// QUICK_START</div>
                 <div class="bg-brutal-black p-6 font-mono text-sm space-y-2 border border-brutal-lightgray">
-                    <div class="text-gray-500">$ tickr --status</div>
-                    <div class="text-green-500">[OK] Database connection: ESTABLISHED</div>
-                    <div class="text-green-500">[OK] Cache layer: ACTIVE</div>
-                    <div class="text-green-500">[OK] CDN: SYNCHRONIZED</div>
-                    <div class="text-green-500">[OK] Queue workers: 24/24 RUNNING</div>
-                    <div class="text-gray-500 mt-4">$ tickr --stats</div>
-                    <div class="text-brutal-red">Active events: 2,547</div>
-                    <div class="text-brutal-red">Active users: 18,932</div>
-                    <div class="text-brutal-red">Requests/min: 45,230</div>
+                    <div class="text-gray-500">$ tickr init</div>
+                    <div class="text-green-500">Creating account...</div>
+                    <div class="text-green-500">Account created successfully</div>
+                    <div class="text-gray-500 mt-4">$ tickr create-event</div>
+                    <div class="text-brutal-cyan">Event name: My Awesome Event</div>
+                    <div class="text-brutal-cyan">Date: 2026-03-15</div>
+                    <div class="text-brutal-cyan">Venue: Downtown Arena</div>
+                    <div class="text-green-500">Event published!</div>
                     <div class="text-gray-500 mt-2 animate-pulse">_</div>
                 </div>
             </div>
@@ -271,15 +230,7 @@
             {% endif %}
         </div>
 
-        <!-- Technical footer -->
-        <div class="mt-16 pt-8 border-t border-brutal-lightgray">
-            <div class="flex flex-wrap justify-center gap-8 font-mono text-xs text-gray-600">
-                <span>[ ENCRYPTION: ON ]</span>
-                <span>[ SSL: TLS_1.3 ]</span>
-                <span>[ 2FA: ENABLED ]</span>
-                <span>[ BACKUP: ACTIVE ]</span>
-            </div>
-        </div>
+
     </div>
 </section>
 {% endblock %}

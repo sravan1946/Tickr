@@ -14,4 +14,15 @@ urlpatterns = [
     path("<uuid:pk>/edit/", views.EventUpdateView.as_view(), name="event_edit"),
     path("<uuid:pk>/delete/", views.EventDeleteView.as_view(), name="event_delete"),
     path("<uuid:pk>/tickets/", TicketTypeListView.as_view(), name="event_tickets"),
+    path("<uuid:pk>/images/", views.EventImageListView.as_view(), name="event_images"),
+    path(
+        "<uuid:pk>/images/<uuid:image_pk>/delete/",
+        views.EventImageDeleteView.as_view(),
+        name="event_image_delete",
+    ),
+    path(
+        "<uuid:pk>/images/<uuid:image_pk>/primary/",
+        views.EventImageSetPrimaryView.as_view(),
+        name="event_image_primary",
+    ),
 ]

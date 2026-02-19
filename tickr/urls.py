@@ -14,8 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 from accounts.views import OrganizerProfileView
 from core.views import HomeView
@@ -28,7 +31,9 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
-    path("organizer/profile/", OrganizerProfileView.as_view(), name="organizer_profile"),
+    path(
+        "organizer/profile/", OrganizerProfileView.as_view(), name="organizer_profile"
+    ),
     path("events/", include("events.urls")),
     path("categories/", CategoryListView.as_view(), name="category_list"),
     path("venues/", VenueListView.as_view(), name="venue_list"),
@@ -36,6 +41,13 @@ urlpatterns = [
     path("orders/", include("orders.urls")),
     path("my/orders/", MyOrdersView.as_view(), name="my_orders"),
     path("promocodes/", include("promotions.urls")),
-    path("events/<uuid:pk>/promocodes/", EventPromoCodeListView.as_view(), name="event_promocode_list"),
+    path(
+        "events/<uuid:pk>/promocodes/",
+        EventPromoCodeListView.as_view(),
+        name="event_promocode_list",
+    ),
     path("checkin/", include("checkin.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

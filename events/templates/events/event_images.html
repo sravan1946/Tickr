@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Images - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'events:event_detail' slug=event.slug %}" class="inline-flex items-center gap-2 text-gray-400 hover:text-brutal-cyan transition-colors font-mono text-sm mb-4">
+            <span class="text-brutal-cyan">&lt;</span>
+            Back to event
+        </a>
+        <h1 class="font-mono text-3xl font-bold text-white tracking-tighter">MANAGE_IMAGES</h1>
+        <p class="text-gray-400 font-mono mt-2">{{ event.title }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Upload Form -->
+        <div class="lg:col-span-1">
+            <div class="brutal-card border-technical p-6 sticky top-24">
+                <h2 class="font-mono text-lg font-bold text-white mb-6 tracking-wider">// UPLOAD_IMAGE</h2>
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-mono text-gray-400 mb-2">IMAGE_FILE</label>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                        <p class="text-brutal-red text-sm font-mono mt-1">{{ form.image.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        {{ form.is_primary }}
+                        <label for="{{ form.is_primary.id_for_label }}" class="text-sm font-mono text-gray-400">Set as primary image</label>
+                    </div>
+                    {% if form.non_field_errors %}
+                    <div class="text-brutal-red text-sm font-mono">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                    {% endif %}
+                    <button type="submit" class="brutal-btn w-full">
+                        UPLOAD_
+                    </button>
+                </form>
+                <div class="mt-6 pt-6 border-t border-brutal-lightgray">
+                    <p class="text-xs text-gray-500 font-mono">
+                        Supported formats: JPG, PNG, GIF<br>
+                        Max file size: 5MB
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Grid -->
+        <div class="lg:col-span-2">
+            <h2 class="font-mono text-lg font-bold text-white mb-6 tracking-wider">// EVENT_IMAGES</h2>
+            
+            {% if images %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {% for image in images %}
+                <div class="brutal-card border-technical overflow-hidden {% if image.is_primary %}border-brutal-cyan{% endif %}">
+                    <div class="aspect-video bg-brutal-gray overflow-hidden">
+                        <img src="{{ image.image.url }}" alt="Event image" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                {% if image.is_primary %}
+                                <span class="px-2 py-1 bg-brutal-cyan text-white text-xs font-mono">PRIMARY</span>
+                                {% else %}
+                                <span class="text-gray-500 text-xs font-mono">NOT PRIMARY</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                {% if not image.is_primary %}
+                                <form method="post" action="{% url 'events:event_image_primary' pk=event.pk image_pk=image.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs font-mono text-brutal-cyan hover:text-white transition-colors" title="Set as primary">
+                                        [SET_PRIMARY]
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="post" action="{% url 'events:event_image_delete' pk=event.pk image_pk=image.pk %}" class="inline" onsubmit="return confirm('Delete this image?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs font-mono text-brutal-red hover:text-red-400 transition-colors" title="Delete">
+                                        [DELETE]
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="brutal-card border-technical p-12 text-center">
+                <div class="w-16 h-16 bg-brutal-gray border border-brutal-lightgray flex items-center justify-center mx-auto mb-4">
+                    <span class="font-mono text-2xl text-gray-500">IMG</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2 font-mono">NO_IMAGES</h3>
+                <p class="text-gray-400 mb-6 font-mono">Upload images to showcase your event</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
