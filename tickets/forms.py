@@ -17,13 +17,25 @@ class TicketTypeForm(forms.ModelForm):
         )
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "e.g., General Admission, VIP"}
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "e.g., General Admission, VIP",
+                }
             ),
             "price": forms.NumberInput(
-                attrs={"class": "form-input", "step": "0.01", "min": "0", "placeholder": "0.00"}
+                attrs={
+                    "class": "form-input",
+                    "step": "0.01",
+                    "min": "0",
+                    "placeholder": "0.00",
+                }
             ),
             "quantity_total": forms.NumberInput(
-                attrs={"class": "form-input", "min": "1", "placeholder": "Total tickets"}
+                attrs={
+                    "class": "form-input",
+                    "min": "1",
+                    "placeholder": "Total tickets",
+                }
             ),
             "sale_start": forms.DateTimeInput(
                 attrs={"class": "form-input", "type": "datetime-local"}

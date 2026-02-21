@@ -6,9 +6,11 @@ class CheckInForm(forms.Form):
 
     code = forms.CharField(
         max_length=150,
-        widget=forms.TextInput(attrs={
-            "class": "form-input",
-            "placeholder": "Enter ticket code",
-            "autofocus": True,
-        }),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-input",
+                "placeholder": "Enter ticket code",
+                "autofocus": True,
+            }
+        ),
     )

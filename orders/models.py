@@ -1,10 +1,12 @@
 import uuid
 from decimal import Decimal
+
 from django.db import models
+
 from accounts.models import User
 from events.models import Event
-from tickets.models import TicketType, Ticket
 from promotions.models import PromoCode
+from tickets.models import Ticket, TicketType
 
 
 class Order(models.Model):
@@ -37,9 +39,9 @@ class Order(models.Model):
     def recalculate_total(self) -> None:
         """Recalculate total_amount from items."""
         from django.db.models import F, Sum
+
         total = (
-            self.items.aggregate(total=Sum(F("quantity") * F("price_per_ticket")))
-            .get("total")
+            self.items.aggregate(total=Sum(F("quantity") * F("price_per_ticket"))).get("total")
         ) or 0
         self.total_amount = total
         self.save(update_fields=["total_amount"])
@@ -48,7 +50,9 @@ class Order(models.Model):
 class OrderItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    ticket_type = models.ForeignKey(TicketType, on_delete=models.CASCADE, related_name="order_items")
+    ticket_type = models.ForeignKey(
+        TicketType, on_delete=models.CASCADE, related_name="order_items"
+    )
     quantity = models.PositiveIntegerField()
     price_per_ticket = models.DecimalField(max_digits=10, decimal_places=2)
 

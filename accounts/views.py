@@ -1,15 +1,15 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect
-from django.views import View
-from django.contrib.auth.hashers import make_password, check_password
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password, make_password
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-
-from .models import User, OrganizerProfile
-from .forms import LoginForm, RegisterForm, OrganizerProfileForm
-from .auth import get_request_user, login_user, logout_user
+from django.views import View
 
 from core.decorators import login_required, organizer_required
+
+from .auth import get_request_user, login_user, logout_user
+from .forms import LoginForm, OrganizerProfileForm, RegisterForm
+from .models import OrganizerProfile, User
 
 
 class LoginView(View):
@@ -18,7 +18,11 @@ class LoginView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
             return redirect("accounts:me")
-        return render(request, "accounts/login.html", {"form": LoginForm(), "next": request.GET.get("next")})
+        return render(
+            request,
+            "accounts/login.html",
+            {"form": LoginForm(), "next": request.GET.get("next")},
+        )
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = LoginForm(request.POST)
@@ -65,7 +69,11 @@ class RegisterView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         if get_request_user(request):
             return redirect("accounts:me")
-        return render(request, "accounts/register.html", {"form": RegisterForm(), "next": request.GET.get("next")})
+        return render(
+            request,
+            "accounts/register.html",
+            {"form": RegisterForm(), "next": request.GET.get("next")},
+        )
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = RegisterForm(request.POST)

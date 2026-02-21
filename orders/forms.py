@@ -1,9 +1,11 @@
 from django import forms
+
 from .models import Attendee
 
 
 class OrderTicketForm(forms.Form):
     """Dynamic form for selecting ticket quantities — rendered per TicketType."""
+
     ticket_type_id = forms.UUIDField(widget=forms.HiddenInput())
     quantity = forms.IntegerField(
         min_value=0,

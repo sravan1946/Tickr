@@ -1,15 +1,15 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
 from core.decorators import organizer_required
-from core.helpers import get_organizer_profile, event_owned_by_user, ticket_type_owned_by_user
+from core.helpers import event_owned_by_user, ticket_type_owned_by_user
 from events.models import Event
 
-from .models import TicketType, Ticket
 from .forms import TicketTypeForm
+from .models import Ticket, TicketType
 
 
 class TicketTypeListView(View):

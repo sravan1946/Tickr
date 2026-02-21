@@ -1,23 +1,23 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.contrib import messages
-from django.utils.decorators import method_decorator
 from django.db import transaction
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.decorators import method_decorator
+from django.views import View
 
 from accounts.auth import get_request_user
 from core.decorators import login_required
 from events.models import Event
-from tickets.models import TicketType, Ticket
 from promotions.models import PromoCode
+from tickets.models import Ticket, TicketType
 
-from .models import Order, OrderItem, Attendee
-from .forms import OrderTicketForm, AttendeeForm
-
+from .forms import AttendeeForm, OrderTicketForm
+from .models import Order, OrderItem
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _get_user_or_redirect(request: HttpRequest):
     """Return the logged-in user or None (callers should redirect)."""
@@ -27,6 +27,7 @@ def _get_user_or_redirect(request: HttpRequest):
 # ---------------------------------------------------------------------------
 # POST /orders/ — create a new order
 # ---------------------------------------------------------------------------
+
 
 class OrderCreateView(View):
     """
@@ -38,7 +39,10 @@ class OrderCreateView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         user = _get_user_or_redirect(request)
         if user and user.is_organizer:
-            messages.error(request, "Organizer accounts cannot purchase tickets. Please use a regular account.")
+            messages.error(
+                request,
+                "Organizer accounts cannot purchase tickets. Please use a regular account.",
+            )
             return redirect("events:event_list")
 
         event_id = request.GET.get("event")
@@ -50,22 +54,31 @@ class OrderCreateView(View):
 
         forms = []
         for tt in ticket_types:
-            forms.append({
-                "ticket_type": tt,
-                "form": OrderTicketForm(initial={"ticket_type_id": tt.pk}),
-            })
+            forms.append(
+                {
+                    "ticket_type": tt,
+                    "form": OrderTicketForm(initial={"ticket_type_id": tt.pk}),
+                }
+            )
 
-        return render(request, "orders/order_create.html", {
-            "event": event,
-            "ticket_forms": forms,
-            "has_promo_codes": event.promo_codes.filter(is_active=True).exists(),
-        })
+        return render(
+            request,
+            "orders/order_create.html",
+            {
+                "event": event,
+                "ticket_forms": forms,
+                "has_promo_codes": event.promo_codes.filter(is_active=True).exists(),
+            },
+        )
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest) -> HttpResponse:
         user = _get_user_or_redirect(request)
         if user and user.is_organizer:
-            messages.error(request, "Organizer accounts cannot purchase tickets. Please use a regular account.")
+            messages.error(
+                request,
+                "Organizer accounts cannot purchase tickets. Please use a regular account.",
+            )
             return redirect("events:event_list")
 
         event_id = request.POST.get("event_id")
@@ -116,7 +129,9 @@ class OrderCreateView(View):
             try:
                 promo = PromoCode.objects.get(code=promo_code_str, event=event)
                 if not promo.is_valid:
-                    messages.warning(request, "Promo code is expired or has reached its usage limit.")
+                    messages.warning(
+                        request, "Promo code is expired or has reached its usage limit."
+                    )
                     promo = None
             except PromoCode.DoesNotExist:
                 messages.warning(request, "Invalid promo code — ignored.")
@@ -149,6 +164,7 @@ class OrderCreateView(View):
 # GET /orders/<id>/ — view order
 # ---------------------------------------------------------------------------
 
+
 class OrderDetailView(View):
     """Display order details with items and attendees."""
 
@@ -175,19 +191,24 @@ class OrderDetailView(View):
             if item.attendees_needed > 0:
                 all_attendees_added = False
 
-        return render(request, "orders/order_detail.html", {
-            "order": order,
-            "items": items,
-            "event": order.event,
-            "all_attendees_added": all_attendees_added,
-            "total_attendees_needed": total_attendees_needed,
-            "total_attendees_added": total_attendees_added,
-        })
+        return render(
+            request,
+            "orders/order_detail.html",
+            {
+                "order": order,
+                "items": items,
+                "event": order.event,
+                "all_attendees_added": all_attendees_added,
+                "total_attendees_needed": total_attendees_needed,
+                "total_attendees_added": total_attendees_added,
+            },
+        )
 
 
 # ---------------------------------------------------------------------------
 # POST /orders/<id>/confirm/ — confirm (pay) order
 # ---------------------------------------------------------------------------
+
 
 class OrderConfirmView(View):
     """Set order status to paid and issue Ticket objects."""
@@ -257,6 +278,7 @@ class OrderConfirmView(View):
 # POST /orders/<id>/cancel/ — cancel order
 # ---------------------------------------------------------------------------
 
+
 class OrderCancelView(View):
     """Cancel an order and release any issued tickets."""
 
@@ -297,6 +319,7 @@ class OrderCancelView(View):
 # GET /my/orders/ — list user's orders
 # ---------------------------------------------------------------------------
 
+
 class MyOrdersView(View):
     """List all orders for the current user."""
 
@@ -304,14 +327,19 @@ class MyOrdersView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         user = _get_user_or_redirect(request)
         orders = Order.objects.filter(user=user).select_related("event")
-        return render(request, "orders/my_orders.html", {
-            "orders": orders,
-        })
+        return render(
+            request,
+            "orders/my_orders.html",
+            {
+                "orders": orders,
+            },
+        )
 
 
 # ---------------------------------------------------------------------------
 # POST /orders/<id>/attendees/ — add attendee info
 # ---------------------------------------------------------------------------
+
 
 class AttendeeCreateView(View):
     """
@@ -333,18 +361,24 @@ class AttendeeCreateView(View):
             existing = item.attendees.count()
             needed = item.quantity - existing
             forms = [AttendeeForm(prefix=f"att-{item.pk}-{i}") for i in range(needed)]
-            items_with_forms.append({
-                "item": item,
-                "existing": item.attendees.all(),
-                "forms": forms,
-                "needed": needed,
-            })
+            items_with_forms.append(
+                {
+                    "item": item,
+                    "existing": item.attendees.all(),
+                    "forms": forms,
+                    "needed": needed,
+                }
+            )
 
-        return render(request, "orders/attendee_form.html", {
-            "order": order,
-            "items_with_forms": items_with_forms,
-            "event": order.event,
-        })
+        return render(
+            request,
+            "orders/attendee_form.html",
+            {
+                "order": order,
+                "items_with_forms": items_with_forms,
+                "event": order.event,
+            },
+        )
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
@@ -379,12 +413,14 @@ class AttendeeCreateView(View):
                     forms_to_save.append(attendee)
                 item_forms.append(form)
 
-            items_with_forms.append({
-                "item": item,
-                "existing": existing_attendees,
-                "forms": item_forms,
-                "needed": needed,
-            })
+            items_with_forms.append(
+                {
+                    "item": item,
+                    "existing": existing_attendees,
+                    "forms": item_forms,
+                    "needed": needed,
+                }
+            )
 
         if all_valid and forms_to_save:
             # Save all attendees
@@ -397,11 +433,15 @@ class AttendeeCreateView(View):
 
         elif not all_valid:
             messages.error(request, "Please correct the errors below.")
-            return render(request, "orders/attendee_form.html", {
-                "order": order,
-                "items_with_forms": items_with_forms,
-                "event": order.event,
-            })
+            return render(
+                request,
+                "orders/attendee_form.html",
+                {
+                    "order": order,
+                    "items_with_forms": items_with_forms,
+                    "event": order.event,
+                },
+            )
 
         # If we got here, maybe no forms were submitted/needed (edge case)
         # or the user just hit save without filling anything new (if needed > 0 but valid?)
@@ -412,7 +452,7 @@ class AttendeeCreateView(View):
         # In that case forms_to_save is empty, all_valid is True.
         # So we should redirect?
         if not forms_to_save:
-             messages.info(request, "No new attendees were added.")
-             return redirect("orders:order_detail", pk=order.pk)
+            messages.info(request, "No new attendees were added.")
+            return redirect("orders:order_detail", pk=order.pk)
 
         return redirect("orders:order_detail", pk=order.pk)

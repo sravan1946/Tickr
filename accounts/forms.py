@@ -1,12 +1,18 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import User, OrganizerProfile
+from .models import OrganizerProfile, User
 
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={"class": "form-input", "placeholder": "you@example.com", "autofocus": True})
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-input",
+                "placeholder": "you@example.com",
+                "autofocus": True,
+            }
+        )
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={"class": "form-input", "placeholder": "Password"})
@@ -20,7 +26,9 @@ class RegisterForm(forms.ModelForm):
         help_text="At least 8 characters.",
     )
     password_confirm = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-input", "placeholder": "Confirm password"}),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-input", "placeholder": "Confirm password"}
+        ),
         label="Confirm password",
     )
     is_organizer = forms.BooleanField(
@@ -34,7 +42,9 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ("email", "username")
         widgets = {
-            "email": forms.EmailInput(attrs={"class": "form-input", "placeholder": "you@example.com"}),
+            "email": forms.EmailInput(
+                attrs={"class": "form-input", "placeholder": "you@example.com"}
+            ),
             "username": forms.TextInput(attrs={"class": "form-input", "placeholder": "Username"}),
         }
 

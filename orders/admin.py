@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Order, OrderItem, Attendee
+
+from .models import Attendee, Order, OrderItem
 
 
 class OrderItemInline(admin.TabularInline):

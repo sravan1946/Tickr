@@ -1,10 +1,20 @@
 from django.contrib import admin
-from .models import TicketType, Ticket
+
+from .models import Ticket, TicketType
 
 
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "event", "price", "quantity_total", "quantity_sold", "is_active", "sale_start", "sale_end")
+    list_display = (
+        "name",
+        "event",
+        "price",
+        "quantity_total",
+        "quantity_sold",
+        "is_active",
+        "sale_start",
+        "sale_end",
+    )
     list_filter = ("is_active", "sale_start", "sale_end")
     search_fields = ("name", "event__title")
     readonly_fields = ("id", "created_at", "quantity_sold")

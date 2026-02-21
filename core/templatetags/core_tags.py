@@ -5,6 +5,7 @@ Usage in templates:
     {% load core_tags %}
     <a href="?{% query_string page=2 %}">Next</a>
 """
+
 from django import template
 from django.utils.http import urlencode
 

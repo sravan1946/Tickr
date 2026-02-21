@@ -2,6 +2,7 @@
 Session-based auth for custom User model.
 Store user id in session; use get_request_user() in views.
 """
+
 from django.http import HttpRequest
 
 from .models import User

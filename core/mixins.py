@@ -5,9 +5,10 @@ Usage:
     class MyView(LoginRequiredMixin, View):
         ...
 """
+
+from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.contrib import messages
 
 from accounts.auth import get_request_user
 

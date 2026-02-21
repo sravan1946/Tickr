@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import EventCategory, Venue, Event, EventImage
+from .models import Event, EventCategory, EventImage, Venue
 
 
 @admin.register(EventCategory)
@@ -18,7 +18,16 @@ class VenueAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("title", "organizer", "category", "venue", "start_date", "end_date", "capacity", "is_published")
+    list_display = (
+        "title",
+        "organizer",
+        "category",
+        "venue",
+        "start_date",
+        "end_date",
+        "capacity",
+        "is_published",
+    )
     list_filter = ("is_published", "is_cancelled", "category", "venue")
     search_fields = ("title", "description")
     raw_id_fields = ("organizer",)

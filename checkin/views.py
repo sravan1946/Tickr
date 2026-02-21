@@ -1,22 +1,22 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
 from accounts.auth import get_request_user
 from core.decorators import organizer_required
-from core.helpers import get_organizer_profile, event_owned_by_user
+from core.helpers import event_owned_by_user
 from events.models import Event
 from tickets.models import Ticket
 
-from .models import CheckIn
 from .forms import CheckInForm
-
+from .models import CheckIn
 
 # ---------------------------------------------------------------------------
 # GET/POST /checkin/<event_id>/ — scan / check-in a ticket
 # ---------------------------------------------------------------------------
+
 
 class CheckInScanView(View):
     """
@@ -31,19 +31,19 @@ class CheckInScanView(View):
             messages.error(request, "You can only check in tickets for your own events.")
             return redirect("events:event_list")
 
-        total_tickets = Ticket.objects.filter(
-            ticket_type__event=event, status="booked"
-        ).count()
-        checked_in_count = CheckIn.objects.filter(
-            ticket__ticket_type__event=event
-        ).count()
+        total_tickets = Ticket.objects.filter(ticket_type__event=event, status="booked").count()
+        checked_in_count = CheckIn.objects.filter(ticket__ticket_type__event=event).count()
 
-        return render(request, "checkin/checkin_scan.html", {
-            "event": event,
-            "form": CheckInForm(),
-            "total_tickets": total_tickets,
-            "checked_in_count": checked_in_count,
-        })
+        return render(
+            request,
+            "checkin/checkin_scan.html",
+            {
+                "event": event,
+                "form": CheckInForm(),
+                "total_tickets": total_tickets,
+                "checked_in_count": checked_in_count,
+            },
+        )
 
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
@@ -54,10 +54,15 @@ class CheckInScanView(View):
 
         form = CheckInForm(request.POST)
         if not form.is_valid():
-            return render(request, "checkin/checkin_scan.html", {
-                "event": event,
-                "form": form,
-            }, status=400)
+            return render(
+                request,
+                "checkin/checkin_scan.html",
+                {
+                    "event": event,
+                    "form": form,
+                },
+                status=400,
+            )
 
         code = form.cleaned_data["code"].strip()
         user = get_request_user(request)
@@ -66,40 +71,56 @@ class CheckInScanView(View):
         try:
             ticket = Ticket.objects.select_related("ticket_type__event").get(code=code)
         except Ticket.DoesNotExist:
-            return render(request, "checkin/checkin_result.html", {
-                "event": event,
-                "success": False,
-                "error": f"No ticket found with code '{code}'.",
-                "form": CheckInForm(),
-            })
+            return render(
+                request,
+                "checkin/checkin_result.html",
+                {
+                    "event": event,
+                    "success": False,
+                    "error": f"No ticket found with code '{code}'.",
+                    "form": CheckInForm(),
+                },
+            )
 
         # Validate ticket belongs to this event
         if ticket.ticket_type.event_id != event.pk:
-            return render(request, "checkin/checkin_result.html", {
-                "event": event,
-                "success": False,
-                "error": f"Ticket '{code}' does not belong to this event.",
-                "form": CheckInForm(),
-            })
+            return render(
+                request,
+                "checkin/checkin_result.html",
+                {
+                    "event": event,
+                    "success": False,
+                    "error": f"Ticket '{code}' does not belong to this event.",
+                    "form": CheckInForm(),
+                },
+            )
 
         # Validate ticket is booked
         if ticket.status != "booked":
-            return render(request, "checkin/checkin_result.html", {
-                "event": event,
-                "success": False,
-                "error": f"Ticket '{code}' has status '{ticket.status}' — only booked tickets can be checked in.",
-                "form": CheckInForm(),
-            })
+            return render(
+                request,
+                "checkin/checkin_result.html",
+                {
+                    "event": event,
+                    "success": False,
+                    "error": f"Ticket '{code}' has status '{ticket.status}' — only booked tickets can be checked in.",
+                    "form": CheckInForm(),
+                },
+            )
 
         # Check if already checked in
         if hasattr(ticket, "checkin"):
-            return render(request, "checkin/checkin_result.html", {
-                "event": event,
-                "success": False,
-                "error": f"Ticket '{code}' has already been checked in at {ticket.checkin.checked_in_at:%Y-%m-%d %H:%M}.",
-                "form": CheckInForm(),
-                "ticket": ticket,
-            })
+            return render(
+                request,
+                "checkin/checkin_result.html",
+                {
+                    "event": event,
+                    "success": False,
+                    "error": f"Ticket '{code}' has already been checked in at {ticket.checkin.checked_in_at:%Y-%m-%d %H:%M}.",
+                    "form": CheckInForm(),
+                    "ticket": ticket,
+                },
+            )
 
         # Perform check-in
         checkin = CheckIn.objects.create(ticket=ticket, checked_in_by=user)
@@ -111,19 +132,24 @@ class CheckInScanView(View):
         except AttributeError:
             pass
 
-        return render(request, "checkin/checkin_result.html", {
-            "event": event,
-            "success": True,
-            "checkin": checkin,
-            "ticket": ticket,
-            "attendee": attendee,
-            "form": CheckInForm(),
-        })
+        return render(
+            request,
+            "checkin/checkin_result.html",
+            {
+                "event": event,
+                "success": True,
+                "checkin": checkin,
+                "ticket": ticket,
+                "attendee": attendee,
+                "form": CheckInForm(),
+            },
+        )
 
 
 # ---------------------------------------------------------------------------
 # GET /checkin/<event_id>/list/ — list all check-ins for an event
 # ---------------------------------------------------------------------------
+
 
 class CheckInListView(View):
     """List all check-ins for an event with stats (organizer only)."""
@@ -136,20 +162,21 @@ class CheckInListView(View):
             return redirect("events:event_list")
 
         checkins = (
-            CheckIn.objects
-            .filter(ticket__ticket_type__event=event)
+            CheckIn.objects.filter(ticket__ticket_type__event=event)
             .select_related("ticket", "ticket__ticket_type", "checked_in_by")
             .order_by("-checked_in_at")
         )
 
-        total_tickets = Ticket.objects.filter(
-            ticket_type__event=event, status="booked"
-        ).count()
+        total_tickets = Ticket.objects.filter(ticket_type__event=event, status="booked").count()
         checked_in_count = checkins.count()
 
-        return render(request, "checkin/checkin_list.html", {
-            "event": event,
-            "checkins": checkins,
-            "total_tickets": total_tickets,
-            "checked_in_count": checked_in_count,
-        })
+        return render(
+            request,
+            "checkin/checkin_list.html",
+            {
+                "event": event,
+                "checkins": checkins,
+                "total_tickets": total_tickets,
+                "checked_in_count": checked_in_count,
+            },
+        )

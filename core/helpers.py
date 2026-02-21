@@ -4,6 +4,7 @@ core.helpers — Shared ownership-check utilities.
 Centralised here so every app can import from one place instead of
 duplicating these private functions in each views.py.
 """
+
 from django.http import HttpRequest
 
 from accounts.auth import get_request_user

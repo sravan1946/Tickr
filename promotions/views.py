@@ -1,20 +1,20 @@
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
 from core.decorators import login_required, organizer_required
 from core.helpers import get_organizer_profile, promo_owned_by_user
 from events.models import Event
 
-from .models import PromoCode
 from .forms import PromoCodeForm, PromoCodeValidateForm
-
+from .models import PromoCode
 
 # ---------------------------------------------------------------------------
 # POST /promocodes/ — create a promo code
 # ---------------------------------------------------------------------------
+
 
 class PromoCodeCreateView(View):
     """
@@ -36,10 +36,14 @@ class PromoCodeCreateView(View):
             return redirect("events:event_list")
 
         form = PromoCodeForm()
-        return render(request, "promotions/promocode_form.html", {
-            "form": form,
-            "event": event,
-        })
+        return render(
+            request,
+            "promotions/promocode_form.html",
+            {
+                "form": form,
+                "event": event,
+            },
+        )
 
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -56,10 +60,15 @@ class PromoCodeCreateView(View):
 
         form = PromoCodeForm(request.POST)
         if not form.is_valid():
-            return render(request, "promotions/promocode_form.html", {
-                "form": form,
-                "event": event,
-            }, status=400)
+            return render(
+                request,
+                "promotions/promocode_form.html",
+                {
+                    "form": form,
+                    "event": event,
+                },
+                status=400,
+            )
 
         promo = form.save(commit=False)
         promo.event = event
@@ -72,6 +81,7 @@ class PromoCodeCreateView(View):
 # PUT /promocodes/<id>/ — update a promo code
 # ---------------------------------------------------------------------------
 
+
 class PromoCodeUpdateView(View):
     """GET: show edit form.  POST: save changes."""
 
@@ -83,11 +93,15 @@ class PromoCodeUpdateView(View):
             return redirect("events:event_list")
 
         form = PromoCodeForm(instance=promo)
-        return render(request, "promotions/promocode_form.html", {
-            "form": form,
-            "event": promo.event,
-            "promo": promo,
-        })
+        return render(
+            request,
+            "promotions/promocode_form.html",
+            {
+                "form": form,
+                "event": promo.event,
+                "promo": promo,
+            },
+        )
 
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
@@ -98,11 +112,16 @@ class PromoCodeUpdateView(View):
 
         form = PromoCodeForm(request.POST, instance=promo)
         if not form.is_valid():
-            return render(request, "promotions/promocode_form.html", {
-                "form": form,
-                "event": promo.event,
-                "promo": promo,
-            }, status=400)
+            return render(
+                request,
+                "promotions/promocode_form.html",
+                {
+                    "form": form,
+                    "event": promo.event,
+                    "promo": promo,
+                },
+                status=400,
+            )
 
         form.save()
         messages.success(request, f"Promo code '{promo.code}' updated.")
@@ -112,6 +131,7 @@ class PromoCodeUpdateView(View):
 # ---------------------------------------------------------------------------
 # DELETE /promocodes/<id>/ — delete a promo code
 # ---------------------------------------------------------------------------
+
 
 class PromoCodeDeleteView(View):
     """GET: confirm delete.  POST: delete."""
@@ -123,10 +143,14 @@ class PromoCodeDeleteView(View):
             messages.error(request, "You can only delete your own promo codes.")
             return redirect("events:event_list")
 
-        return render(request, "promotions/promocode_confirm_delete.html", {
-            "promo": promo,
-            "event": promo.event,
-        })
+        return render(
+            request,
+            "promotions/promocode_confirm_delete.html",
+            {
+                "promo": promo,
+                "event": promo.event,
+            },
+        )
 
     @method_decorator(organizer_required)
     def post(self, request: HttpRequest, pk: str) -> HttpResponse:
@@ -144,6 +168,7 @@ class PromoCodeDeleteView(View):
 # ---------------------------------------------------------------------------
 # POST /promocodes/validate/ — validate a promo code
 # ---------------------------------------------------------------------------
+
 
 class PromoCodeValidateView(View):
     """
@@ -187,13 +212,17 @@ class PromoCodeValidateView(View):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return JsonResponse(data)
 
-        messages.success(request, f"Promo code '{promo.code}' is valid! {promo.discount_value}{'%' if promo.discount_type == 'percentage' else ' flat'} discount.")
+        messages.success(
+            request,
+            f"Promo code '{promo.code}' is valid! {promo.discount_value}{'%' if promo.discount_type == 'percentage' else ' flat'} discount.",
+        )
         return redirect(f"/orders/?event={event_id}")
 
 
 # ---------------------------------------------------------------------------
 # GET /events/<id>/promocodes/ — list promo codes for an event
 # ---------------------------------------------------------------------------
+
 
 class EventPromoCodeListView(View):
     """List all promo codes for an event (organizer only)."""
@@ -207,7 +236,11 @@ class EventPromoCodeListView(View):
             return redirect("events:event_list")
 
         promo_codes = event.promo_codes.all()
-        return render(request, "promotions/promocode_list.html", {
-            "event": event,
-            "promo_codes": promo_codes,
-        })
+        return render(
+            request,
+            "promotions/promocode_list.html",
+            {
+                "event": event,
+                "promo_codes": promo_codes,
+            },
+        )

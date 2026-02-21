@@ -1,4 +1,5 @@
 from django.urls import path
+
 from tickets.views import TicketTypeListView
 
 from . import views

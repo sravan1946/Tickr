@@ -1,6 +1,8 @@
-import uuid
 import secrets
+import uuid
+
 from django.db import models
+
 from events.models import Event
 
 
@@ -31,6 +33,7 @@ class TicketType(models.Model):
     def is_on_sale(self) -> bool:
         """Check if tickets are currently on sale."""
         from django.utils import timezone
+
         now = timezone.now()
         return (
             self.is_active
@@ -68,5 +71,3 @@ class Ticket(models.Model):
             if not cls.objects.filter(code=code).exists():
                 return code
         raise ValueError("Unable to generate unique ticket code after multiple attempts")
-
-

@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Event, EventCategory, Venue, EventImage
+from .models import Event, EventImage
 
 
 class EventForm(forms.ModelForm):
@@ -19,9 +19,7 @@ class EventForm(forms.ModelForm):
             "is_published",
         )
         widgets = {
-            "title": forms.TextInput(
-                attrs={"class": "form-input", "placeholder": "Event title"}
-            ),
+            "title": forms.TextInput(attrs={"class": "form-input", "placeholder": "Event title"}),
             "slug": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "url-friendly-name"}
             ),

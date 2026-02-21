@@ -1,14 +1,14 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
 from core.decorators import organizer_required
-from core.helpers import get_organizer_profile, event_owned_by_user
+from core.helpers import event_owned_by_user, get_organizer_profile
 
-from .models import Event, EventCategory, Venue, EventImage
 from .forms import EventForm, EventImageForm
+from .models import Event, EventCategory, EventImage, Venue
 
 
 class EventListView(View):

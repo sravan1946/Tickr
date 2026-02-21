@@ -1,0 +1,24 @@
+[tool.ruff]
+# Set line length to 99
+line-length = 99
+
+# Exclude migrations and other common directories
+exclude = [
+    "**/migrations/*",
+    ".git",
+    "__pycache__",
+    "venv",
+    ".ruff_cache",
+]
+
+[tool.ruff.lint]
+# Enable some common rules
+select = ["E", "F", "I", "W"]
+ignore = []
+
+[tool.ruff.format]
+# Use black-like formatting
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
