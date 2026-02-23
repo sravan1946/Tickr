@@ -28,8 +28,7 @@
                 <input
                     type="{% if 'email' in field.name %}email{% elif 'phone' in field.name %}tel{% else %}text{% endif %}"
                     name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
-                    class="brutal-input w-full" placeholder="Enter {{ field.label|lower }}" {% if
-                    field.field.required %}required{% endif %}>
+                    class="brutal-input w-full" placeholder="Enter {{ field.label|lower }}" {% if field.field.required %}required{% endif %}>
                 {% if field.errors %}
                 <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                 {% endif %}

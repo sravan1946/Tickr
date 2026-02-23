@@ -1,14 +1,32 @@
+import os
 from datetime import timedelta
 
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from accounts.models import OrganizerProfile, User
 from checkin.models import CheckIn
-from events.models import Event, EventCategory, Venue
+from events.models import Event, EventCategory, EventImage, Venue
 from orders.models import Attendee, Order, OrderItem
 from promotions.models import PromoCode
 from tickets.models import Ticket, TicketType
+
+
+def attach_seed_image(event, filename, is_primary=True):
+    """Attaches a pre-generated seed image to the event."""
+    seed_path = os.path.join(settings.BASE_DIR, "media", "seed_images", filename)
+    if os.path.exists(seed_path):
+        with open(seed_path, "rb") as f:
+            EventImage.objects.create(
+                event=event,
+                image=File(f, name=filename),
+                is_primary=is_primary
+            )
+    else:
+        print(f"Warning: Seed image {filename} not found at {seed_path}")
 
 
 class Command(BaseCommand):
@@ -25,6 +43,7 @@ class Command(BaseCommand):
         PromoCode.objects.all().delete()
         Ticket.objects.all().delete()
         TicketType.objects.all().delete()
+        EventImage.objects.all().delete()
         Event.objects.all().delete()
         Venue.objects.all().delete()
         EventCategory.objects.all().delete()
@@ -40,7 +59,7 @@ class Command(BaseCommand):
         org1 = User.objects.create(
             username="org1",
             email="org1@gmail.com",
-            password="asdfasdf",
+            password=make_password("asdfasdf"),
             is_organizer=True,
         )
         OrganizerProfile.objects.create(
@@ -54,7 +73,7 @@ class Command(BaseCommand):
         org2 = User.objects.create(
             username="org2",
             email="org2@gmail.com",
-            password="asdfasdf",
+            password=make_password("asdfasdf"),
             is_organizer=True,
         )
         OrganizerProfile.objects.create(
@@ -66,8 +85,8 @@ class Command(BaseCommand):
         )
 
         # Normal Users
-        user1 = User.objects.create(username="user1", email="user1@gmail.com", password="asdfasdf")
-        user2 = User.objects.create(username="user2", email="user2@gmail.com", password="asdfasdf")
+        user1 = User.objects.create(username="user1", email="user1@gmail.com", password=make_password("asdfasdf"))
+        user2 = User.objects.create(username="user2", email="user2@gmail.com", password=make_password("asdfasdf"))
 
         # Create Venues
         self.stdout.write("Creating venues...")
@@ -103,6 +122,8 @@ class Command(BaseCommand):
             is_published=True,
             capacity=venue1.capacity,
         )
+        self.stdout.write("Adding images to Summer Vibes Concert...")
+        attach_seed_image(event1, "summer_vibes_main.png", is_primary=True)
 
         event2 = Event.objects.create(
             organizer=org1.organizer_profile,
@@ -116,6 +137,8 @@ class Command(BaseCommand):
             is_published=True,
             capacity=venue2.capacity,
         )
+        self.stdout.write("Adding images to Tech Future Summit...")
+        attach_seed_image(event2, "tech_future_main.png", is_primary=True)
 
         event3 = Event.objects.create(
             organizer=org2.organizer_profile,
@@ -129,6 +152,8 @@ class Command(BaseCommand):
             is_published=True,
             capacity=venue1.capacity,
         )
+        self.stdout.write("Adding images to Modern Art Gala...")
+        attach_seed_image(event3, "modern_art_main.png", is_primary=True)
 
         # Create Ticket Types
         self.stdout.write("Creating ticket types...")
