@@ -20,14 +20,20 @@ class EventListView(View):
             .order_by("-start_date")
             .prefetch_related("ticket_types")
         )
+        category = request.GET.get("category")
+        if category:
+            events = events.filter(category__name__iexact=category)
         organizer_profile = get_organizer_profile(request)
         my_events: list[Event] = []
         if organizer_profile:
-            my_events = list(
+            my_events_qs = (
                 Event.objects.filter(organizer=organizer_profile)
                 .order_by("-created_at")
                 .prefetch_related("ticket_types")
             )
+            if category:
+                my_events_qs = my_events_qs.filter(category__name__iexact=category)
+            my_events = list(my_events_qs)
         return render(
             request,
             "events/event_list.html",
