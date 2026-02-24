@@ -8,5 +8,6 @@ services:
     environment:
       - DEBUG=1
       - SECRET_KEY=django-secure-9a12ld8-mx08ycdbp8-f-z-7v-y-d-3l-23w-6s-br8p-ep-qa
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,tickr.p1ng.me
+      - DJANGO_CSRF_TRUSTED_ORIGINS=https://tickr.p1ng.me
     command: uvicorn tickr.asgi:application --host 0.0.0.0 --port 8000 --reload
