@@ -4,3 +4,4 @@ django-filter==25.2
 Markdown==3.10.2
 pillow==12.1.1
 uvicorn[standard]==0.34.0
+whitenoise==6.8.2
