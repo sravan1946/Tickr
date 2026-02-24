@@ -173,6 +173,152 @@ tickr/
 └── README.md
 ```
 
+## Data Model & Schema
+
+```mermaid
+erDiagram
+    User {
+        UUID id PK
+        string email UK
+        string username
+        string password
+        boolean is_organizer
+        boolean is_active
+        datetime created_at
+    }
+
+    OrganizerProfile {
+        UUID id PK
+        UUID user_id FK
+        string organization_name
+        string contact_email
+        string contact_phone
+        boolean verified
+        datetime created_at
+    }
+
+    EventCategory {
+        UUID id PK
+        string name
+        string slug UK
+    }
+
+    Venue {
+        UUID id PK
+        string name
+        string address
+        string city
+        int capacity
+    }
+
+    Event {
+        UUID id PK
+        UUID organizer_id FK
+        UUID category_id FK
+        UUID venue_id FK
+        string title
+        string slug UK
+        text description
+        datetime start_date
+        datetime end_date
+        boolean is_published
+        boolean is_cancelled
+        datetime created_at
+        int capacity
+    }
+
+    EventImage {
+        UUID id PK
+        UUID event_id FK
+        image image
+        boolean is_primary
+    }
+
+    TicketType {
+        UUID id PK
+        UUID event_id FK
+        string name
+        decimal price
+        int quantity_total
+        int quantity_sold
+        datetime sale_start
+        datetime sale_end
+        boolean is_active
+        datetime created_at
+    }
+
+    Ticket {
+        UUID id PK
+        UUID ticket_type_id FK
+        string code UK
+        string status
+        datetime created_at
+    }
+
+    PromoCode {
+        UUID id PK
+        UUID event_id FK
+        string code UK
+        string discount_type
+        decimal discount_value
+        int usage_limit
+        int used_count
+        datetime expires_at
+        boolean is_active
+    }
+
+    Order {
+        UUID id PK
+        UUID user_id FK
+        UUID event_id FK
+        UUID promo_code_id FK
+        decimal total_amount
+        string status
+        datetime created_at
+    }
+
+    OrderItem {
+        UUID id PK
+        UUID order_id FK
+        UUID ticket_type_id FK
+        int quantity
+        decimal price_per_ticket
+    }
+
+    Attendee {
+        UUID id PK
+        UUID order_item_id FK
+        string full_name
+        string email
+        UUID ticket_id FK
+    }
+
+    CheckIn {
+        UUID id PK
+        UUID ticket_id FK
+        datetime checked_in_at
+        UUID checked_in_by FK
+    }
+
+    User ||--o| OrganizerProfile : "has profile"
+    OrganizerProfile ||--o{ Event : "organizes"
+    EventCategory ||--o{ Event : "categorizes"
+    Venue ||--o{ Event : "hosts"
+    Event ||--o{ EventImage : "has images"
+    Event ||--o{ TicketType : "offers"
+    Event ||--o{ PromoCode : "has promos"
+    Event ||--o{ Order : "receives orders"
+    TicketType ||--o{ Ticket : "generates"
+    TicketType ||--o{ OrderItem : "purchased as"
+    User ||--o{ Order : "places"
+    Order ||--o{ OrderItem : "contains"
+    OrderItem ||--o{ Attendee : "assigns"
+    Ticket ||--o| Attendee : "held by"
+    Ticket ||--o| CheckIn : "checked in"
+    User ||--o{ CheckIn : "performs"
+    PromoCode ||--o{ Order : "applied to"
+```
+
 ## Key Architecture Decisions
 
 ### Custom Authentication System
