@@ -55,7 +55,7 @@
                     class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
                 <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
                     {% for choice in field.field.choices %}
-                    <option value="{{ choice.0 }}" {% if field.value==choice.0 %}selected{% endif %}>{{ choice.1 }}
+                    <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}
                     </option>
                     {% endfor %}
                 </select>
