@@ -23,73 +23,74 @@
                 </p>
             </div>
         </div>
-        
-        <form method="post" action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_create' %}{% endif %}" class="space-y-6">
+
+        <form method="post"
+            action="{% if event %}{% url 'events:event_edit' pk=event.pk %}{% else %}{% url 'events:event_list' %}{% endif %}"
+            class="space-y-6">
             {% csrf_token %}
-            
+
             {% for field in form %}
-                {% if field.name == "start_date" %}
-                    {% with end_field=form.end_date %}
-                        {% include "includes/daterangepicker.html" with start_field=field end_field=end_field %}
-                    {% endwith %}
-                {% elif field.name == "end_date" %}
-                    {# Skip, handled with start_date #}
-                {% elif field.name == "description" %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
-                        <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="5" 
-                            class="brutal-input w-full resize-none"
-                            {% if field.value %}placeholder="{{ field.value }}"{% endif %}>{{ field.value|default:'' }}</textarea>
-                        {% if field.errors %}
-                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
-                        {% endif %}
-                    </div>
-                {% elif field.name == "category" or field.name == "venue" %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
-                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
-                            {% for choice in field.field.choices %}
-                                <option value="{{ choice.0 }}" {% if field.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if field.errors %}
-                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
-                        {% endif %}
-                    </div>
-                {% elif field.field.widget.input_type == "checkbox" %}
-                    <label class="form-checkbox-wrapper">
-                        <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
-                        <span class="form-checkbox-switch"></span>
-                        <span class="form-checkbox-label">{{ field.label }}</span>
-                    </label>
-                    {% if field.errors %}
-                        <div class="text-brutal-red text-sm mt-2 font-mono">[ERROR] {{ field.errors }}</div>
-                    {% endif %}
-                {% else %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
-                        <input type="{{ field.field.widget.input_type|default:'text' }}" 
-                            name="{{ field.name }}" 
-                            id="{{ field.id_for_label }}"
-                            value="{{ field.value|default:'' }}"
-                            class="brutal-input w-full"
-                            {% if field.field.required %}required{% endif %}>
-                        {% if field.errors %}
-                            <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
-                        {% endif %}
-                        {% if field.help_text %}
-                            <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
-                        {% endif %}
-                    </div>
+            {% if field.name == "start_date" %}
+            {% with end_field=form.end_date %}
+            {% include "includes/daterangepicker.html" with start_field=field end_field=end_field %}
+            {% endwith %}
+            {% elif field.name == "end_date" %}
+            {# Skip, handled with start_date #}
+            {% elif field.name == "description" %}
+            <div>
+                <label for="{{ field.id_for_label }}"
+                    class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
+                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="5"
+                    class="brutal-input w-full resize-none" {% if field.value %}placeholder="{{ field.value }}" {% endif %}>{{ field.value|default:'' }}</textarea>
+                {% if field.errors %}
+                <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
                 {% endif %}
+                {% if field.help_text %}
+                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% elif field.name == "category" or field.name == "venue" %}
+            <div>
+                <label for="{{ field.id_for_label }}"
+                    class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
+                <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
+                    {% for choice in field.field.choices %}
+                    <option value="{{ choice.0 }}" {% if field.value==choice.0 %}selected{% endif %}>{{ choice.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if field.errors %}
+                <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% elif field.field.widget.input_type == "checkbox" %}
+            <label class="form-checkbox-wrapper">
+                <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}>
+                <span class="form-checkbox-switch"></span>
+                <span class="form-checkbox-label">{{ field.label }}</span>
+            </label>
+            {% if field.errors %}
+            <div class="text-brutal-red text-sm mt-2 font-mono">[ERROR] {{ field.errors }}</div>
+            {% endif %}
+            {% else %}
+            <div>
+                <label for="{{ field.id_for_label }}"
+                    class="block text-sm font-medium text-gray-300 mb-2 font-mono tracking-wider">{{ field.label|upper }}</label>
+                <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}"
+                    id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}" class="brutal-input w-full" {% if field.field.required %}required{% endif %}>
+                {% if field.errors %}
+                <div class="mt-2 text-brutal-red text-sm font-mono">[ERROR] {{ field.errors }}</div>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="mt-2 text-gray-500 text-sm font-mono">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
             {% endfor %}
-            
+
             <div class="flex flex-col sm:flex-row gap-4 pt-4">
                 <button type="submit" class="brutal-btn flex-1 flex items-center justify-center gap-2">
                     {% if event %}UPDATE_{% else %}CREATE_{% endif %}
